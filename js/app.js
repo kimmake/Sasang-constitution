@@ -298,7 +298,9 @@
     app.innerHTML = state.view === 'start' ? renderStart() : state.view === 'q' ? renderQuestion() : renderResult();
     var t = document.getElementById('view-title');
     if (t) t.focus({ preventScroll: true });
-    window.scrollTo(0, 0);
+    // 문항 화면은 질문 카드가 바로 보이게, 나머지 화면은 맨 위로
+    var card = state.view === 'q' ? app.querySelector('.bubble-card') : null;
+    window.scrollTo(0, card ? Math.max(0, card.getBoundingClientRect().top + window.pageYOffset - 12) : 0);
   }
 
   function refreshChoice() {
