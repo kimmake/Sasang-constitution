@@ -27,6 +27,8 @@
     ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
   }
 
+  var figs = null;
+
   // dry=true 이면 높이만 계산
   // 영역별 짧은 표현을 한 문장으로 묶어 이미지를 간결하게 만듭니다
   function condense(m) {
@@ -57,12 +59,12 @@
     // 머리말
     y = 64;
     font('700', 28);
-    var pillW = ctx.measureText('참고용 설문 결과').width + 44;
-    if (!dry) { rr(ctx, PAD, y, pillW, 52, 26); ctx.fillStyle = C.green; ctx.fill(); ctx.fillStyle = '#fff'; ctx.textBaseline = 'middle'; ctx.fillText('참고용 설문 결과', PAD + 22, y + 27); }
+    var pillW = ctx.measureText('설문 결과').width + 44;
+    if (!dry) { rr(ctx, PAD, y, pillW, 52, 26); ctx.fillStyle = C.green; ctx.fill(); ctx.fillStyle = '#fff'; ctx.textBaseline = 'middle'; ctx.fillText('설문 결과', PAD + 22, y + 27); }
     y += 52 + 26;
     para('나의 사상체질 관련 특성', PAD, INNER, 58, '800', C.green, 76);
     y += 8;
-    para('체질을 확정하지 않고, 응답에서 확인된 행동·생활 특성을 정리했어요.', PAD, INNER, 30, '500', C.muted, 44);
+    para('응답에서 확인된 유형과 행동·생활 특성을 정리했어요.', PAD, INNER, 30, '500', C.muted, 44);
     y += 24;
 
     // 응답 현황
@@ -80,26 +82,48 @@
     para(summary, saveX, INNER - 200 - 8, 28, '500', C.text, 42);
     y = sy + sh + 24;
 
-    // KS-15 방식 참고 결과 (확률·정확도 수치 없음)
+    // 내 유형 카드: 인물 그림 + 유형명 + 체형/성격 표 (확률·정확도 수치 없음)
     if (m.ks) {
-      var kt = m.ks.tie ? S.typeResult.tie : null;
-      var cav = S.typeResult.brief;
-      var bh = (kt ? measure(kt, INNER - 56, 30, '600', 46) + 40 : 156) + measure(cav, INNER - 56, 24, '400', 36) + 56;
-      if (!dry) { rr(ctx, PAD, y, INNER, bh, 20); ctx.fillStyle = C.green; ctx.fill(); }
-      var by0 = y; y += 28;
-      if (kt) {
-        para(kt, PAD + 28, INNER - 56, 30, '600', '#ffffff', 46);
+      var tc = m.typeCard;
+      if (m.ks.tie || !tc) {
+        var kt = S.typeResult.tie;
+        var th0 = measure(kt, INNER - 56, 30, '600', 46) + 40;
+        if (!dry) { rr(ctx, PAD, y, INNER, th0, 20); ctx.fillStyle = C.card; ctx.fill(); }
+        var t0 = y; y += 20;
+        para(kt, PAD + 28, INNER - 56, 30, '600', C.text, 46);
+        y = t0 + th0 + 24;
       } else {
-        font('700', 28); ctx.fillStyle = '#ffffff'; ctx.textBaseline = 'top'; ctx.textAlign = 'center';
-        if (!dry) { ctx.fillText(S.typeResult.title + ' (참고용)', W / 2, y); }
-        y += 44;
-        font('800', 84); if (!dry) { ctx.fillText(m.ks.topName, W / 2, y); }
-        y += 104;
-        ctx.textAlign = 'left';
+        var INK = '#2b2b2b', FIGW = 200, FIGH = 380, lblW = 100, cx0 = PAD + 28 + FIGW + 16, cw = INNER - 56 - (FIGW + 16) * 2, tw = cw - lblW - 28;
+        font('800', 30); ctx.fillStyle = C.green; ctx.textBaseline = 'top';
+        if (!dry) ctx.fillText(S.typeResult.title, PAD, y);
+        y += 52;
+        var bH = measure(tc.build, tw, 25, '600', 37) + 32, cH = measure(tc.character, tw, 25, '600', 37) + 32;
+        var centerH = 92 + bH + cH, inner = Math.max(FIGH, centerH);
+        var cardH = 28 + 52 + inner + 28;
+        if (!dry) {
+          rr(ctx, PAD, y, INNER, cardH, 28); ctx.fillStyle = '#d6efe3'; ctx.fill(); ctx.lineWidth = 4; ctx.strokeStyle = INK; ctx.stroke();
+          font('900', 34); ctx.fillStyle = INK; ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.fillText('- 사상체질 -', W / 2, y + 22); ctx.textAlign = 'left';
+        }
+        var iy = y + 28 + 52;
+        if (!dry && figs) {
+          ctx.drawImage(figs.F, PAD + 28, iy + (inner - FIGH) / 2, FIGW, FIGH);
+          ctx.drawImage(figs.M, W - PAD - 28 - FIGW, iy + (inner - FIGH) / 2, FIGW, FIGH);
+        }
+        var ty = iy + (inner - centerH) / 2;
+        if (!dry) { font('900', 62); ctx.fillStyle = INK; ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.fillText(tc.name, cx0 + cw / 2, ty); ctx.textAlign = 'left'; }
+        var ry = ty + 92;
+        [['체형', tc.build, bH], ['성격', tc.character, cH]].forEach(function (row) {
+          if (!dry) {
+            ctx.fillStyle = '#fff'; ctx.fillRect(cx0, ry, cw, row[2]); ctx.fillStyle = '#cdeedd'; ctx.fillRect(cx0, ry, lblW, row[2]);
+            ctx.lineWidth = 3; ctx.strokeStyle = INK; ctx.strokeRect(cx0, ry, cw, row[2]); ctx.strokeRect(cx0, ry, lblW, row[2]);
+            font('900', 28); ctx.fillStyle = INK; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(row[0], cx0 + lblW / 2, ry + row[2] / 2); ctx.textAlign = 'left';
+          }
+          var sy0 = y; y = ry + 16;
+          para(row[1], cx0 + lblW + 14, tw, 25, '600', '#222', 37);
+          y = sy0; ry += row[2];
+        });
+        y = y + cardH + 24;
       }
-      y += 8;
-      para(cav, PAD + 28, INNER - 56, 24, '400', '#e6f5ec', 36);
-      y = by0 + bh + 24;
     }
 
     if (m.recentChange) {
@@ -192,13 +216,29 @@
     blobRef = null;
   }
 
+  function loadSvg(svg) {
+    return new Promise(function (resolve) {
+      var img = new Image();
+      var url = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }));
+      img.onload = function () { resolve(img); };
+      img.onerror = function () { resolve(null); };
+      img.src = url;
+    });
+  }
+
   function open(model) {
     overlay = overlay || document.getElementById('overlay');
     img = img || document.getElementById('preview-img');
     saveBtn = saveBtn || document.getElementById('img-save');
     helpEl = helpEl || document.getElementById('overlay-help');
-    var ready = (document.fonts && document.fonts.load) ? Promise.all(['500 20px Pretendard', '700 20px Pretendard', '800 20px Pretendard'].map(function (f) { return document.fonts.load(f, '가'); })).catch(function () {}) : Promise.resolve();
-    ready.then(function () {
+    var ready = (document.fonts && document.fonts.load) ? Promise.all(['500 20px Pretendard', '700 20px Pretendard', '800 20px Pretendard', '900 20px Pretendard'].map(function (f) { return document.fonts.load(f, '가'); })).catch(function () {}) : Promise.resolve();
+    var figsReady = Promise.resolve(null);
+    if (model.typeCard && window.SurveyToon) {
+      var f = model.typeCard.figure;
+      figsReady = Promise.all([loadSvg(window.SurveyToon(f, 'F', [])), loadSvg(window.SurveyToon(f, 'M', []))]).then(function (r) { return r[0] && r[1] ? { F: r[0], M: r[1] } : null; });
+    }
+    Promise.all([ready, figsReady]).then(function (res) {
+      figs = res[1];
       var cv = render(model);
       cv.toBlob(function (blob) {
         if (!blob) { alert('이미지를 만들지 못했어요. 다른 브라우저로 시도해 주세요.'); return; }

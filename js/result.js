@@ -72,7 +72,25 @@
     var max = Math.max.apply(null, scores);
     var tops = [];
     scores.forEach(function (s, i) { if (Math.abs(s - max) < 1e-9) tops.push(i); });
-    return { sex: sex, scores: scores, top: tops.length === 1 ? tops[0] : null, tie: tops.length > 1 };
+    var top = tops.length === 1 ? tops[0] : null;
+    var contrib = [];
+    if (top !== null) {
+      visibleQuestions(answers).forEach(function (q) {
+        if (!q.ks) return;
+        var w = S.ks15.weights[q.id][answers[q.id]][sex][top];
+        if (w > 0) contrib.push({ q: q.id, w: w, text: contribText(q, answers[q.id]) });
+      });
+      contrib.sort(function (a, b) { return b.w - a.w; });
+      contrib = contrib.slice(0, 4).map(function (c) { return c.text; });
+    }
+    return { sex: sex, scores: scores, top: top, tie: tops.length > 1, contrib: contrib };
+  }
+
+  // 점수에 반영된 응답을 짧은 문구로 (요약 문장의 short 재사용)
+  function contribText(q, v) {
+    var t = S.traits.filter(function (x) { return x.choice && x.choice.q === q.id; })[0];
+    if (t && t.short) return t.short[v];
+    return q.options[v] === '중간' ? '성향이 중간' : q.options[v] + '인 성향';
   }
 
   function build(answers) {
@@ -108,7 +126,7 @@
       holdAll: answeredCore < Math.ceil(core.length * T.overallMinRatio),
       domains: domains,
       recentChange: recent ? S.recentChange.notice : '',
-      ks: ks ? { scores: ks.scores, top: ks.top, tie: ks.tie, topName: ks.top === null ? null : S.ks15.labels[ks.top] } : null
+      ks: ks ? { scores: ks.scores, top: ks.top, tie: ks.tie, contrib: ks.contrib, topName: ks.top === null ? null : S.ks15.labels[ks.top] } : null
     };
   }
 

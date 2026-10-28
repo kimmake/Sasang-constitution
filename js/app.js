@@ -46,7 +46,7 @@
     var legW = f.leg * k, gap = 6, feetY = hiY + 150 * (f.scale || 1), armW = 14 * (f.scale || 1) + 2;
     var skin = '#fcdcc0', top = F ? '#ffffff' : '#bfe3cd', shorts = F ? '#f6c945' : '#b79a9a';
     var o = ' stroke="' + INK + '" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"';
-    var out = '<svg class="toon" viewBox="0 0 200 380" aria-hidden="true">';
+    var out = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="380" class="toon" viewBox="0 0 200 380" aria-hidden="true">';
 
     // 팔 (몸통 뒤)
     [-1, 1].forEach(function (d) {
@@ -94,6 +94,8 @@
     return out + '</svg>';
   }
 
+  window.SurveyToon = toon;
+
   function figureCol(t, fig) {
     var cs = (t.callouts || []).filter(function (c) { return c.fig === fig; });
     function lab(pos) {
@@ -103,19 +105,34 @@
     return '<div class="st-fig st-' + (fig === 'F' ? 'left' : 'right') + '">' + lab('top') + toon(t.figure, fig, cs) + lab('bottom') + '</div>';
   }
 
-  function renderTypes(topKs) {
-    return '<details class="fold fold-card types"><summary>' + esc(S.typesIntro.title) + '</summary><div class="fold-body">' +
+  // 유형 카드 1장 (mine이면 내 응답 행, 아니면 점수 기준 행을 추가)
+  function renderTypeCard(t, mine, contrib) {
+    var rows = '<tr><th scope="row">체형</th><td>' + esc(t.build) + '</td></tr>' +
+      '<tr><th scope="row">성격</th><td>' + esc(t.character) + '</td></tr>';
+    if (mine && contrib && contrib.length) {
+      rows += '<tr><th scope="row">내 응답</th><td><p class="row-note">점수에 크게 반영된 내 응답이에요.</p><ul class="chips">' +
+        contrib.map(function (x) { return '<li class="chip">' + esc(x) + '</li>'; }).join('') + '</ul></td></tr>';
+    } else if (!mine) {
+      rows += '<tr><th scope="row">점수 기준</th><td>' + (t.signals && t.signals.length
+        ? '<p class="row-note">' + esc(S.typeResult.signalsNote) + '</p><ul class="chips">' + t.signals.map(function (x) { return '<li class="chip">' + esc(x) + '</li>'; }).join('') + '</ul>'
+        : esc(S.typeResult.noSignals)) + '</td></tr>';
+    }
+    return '<article class="st-card' + (mine ? ' is-mine' : '') + '">' +
+      '<div class="st-title">- 사상체질 -</div>' +
+      '<div class="st-grid">' + figureCol(t, 'F') +
+        '<div class="st-mid"><h3 class="st-name">' + esc(t.name) + '</h3>' +
+          '<table class="st-table"><tbody>' + rows + '</tbody></table></div>' +
+        figureCol(t, 'M') +
+      '</div></article>';
+  }
+
+  // 내 유형을 뺀 나머지(또는 판별이 안 되면 네 유형 모두)
+  function renderOtherTypes(m) {
+    var top = m.ks && m.ks.top !== null ? m.ks.top : null;
+    var list = S.types.filter(function (t) { return top === null || t.ks !== top; });
+    return '<details class="fold fold-card types"><summary>' + (top === null ? esc(S.typesIntro.title) : '다른 유형도 알아보기') + '</summary><div class="fold-body">' +
       '<p class="types-note">' + esc(S.typesIntro.note) + '</p>' +
-      '<div class="st-list">' + S.types.map(function (t) {
-        var mine = topKs !== null && topKs !== undefined && t.ks === topKs;
-        return '<article class="st-card' + (mine ? ' is-mine' : '') + '">' +
-          '<div class="st-title">- 사상체질 -</div>' +
-          '<div class="st-grid">' + figureCol(t, 'F') +
-            '<div class="st-mid"><h3 class="st-name">' + esc(t.name) + '</h3>' + (mine ? '<span class="mine">내 응답과 가까운 유형</span>' : '') +
-              '<table class="st-table"><tbody><tr><th scope="row">체형</th><td>' + esc(t.build) + '</td></tr><tr><th scope="row">성격</th><td>' + esc(t.character) + '</td></tr></tbody></table></div>' +
-            figureCol(t, 'M') +
-          '</div></article>';
-      }).join('') + '</div></div></details>';
+      '<div class="st-list">' + list.map(function (t) { return renderTypeCard(t, false); }).join('') + '</div></div></details>';
   }
 
   /* ───────── 시작 ───────── */
@@ -203,26 +220,25 @@
   }
 
 
-  /* KS-15 방식 점수로 가장 가까운 유형 표시 (확률·정확도 수치는 만들지 않음) */
+  /* 응답과 가장 가까운 유형: 내 유형 카드를 바로 보여줌 (확률·정확도 수치는 만들지 않음) */
   function renderTypeResult(m) {
     var tr = S.typeResult;
     var inner;
-    var detail = '<details class="fold"><summary>유의사항·점수 자세히 보기</summary><div class="fold-body">' +
-      (m.ks && !m.ks.tie ? '<table class="score-table"><thead><tr><th>유형</th><th>KS-15 가중치 합계</th></tr></thead><tbody>' +
-        S.ks15.labels.map(function (name, i) {
-          return '<tr' + (i === m.ks.top ? ' class="top"' : '') + '><th scope="row">' + esc(name) + '</th><td>' + m.ks.scores[i].toFixed(2) + '</td></tr>';
-        }).join('') + '</tbody></table><p class="body-text">점수는 확률이 아니며, 점수 차이가 작으면 판별이 덜 뚜렷할 수 있어요.</p>' : '') +
-      '<ul class="caveats">' + tr.caveats.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div></details>';
     if (!m.ks) {
       inner = '<p class="hold">' + esc(S.holdText.overall) + '</p>';
     } else if (m.ks.tie) {
       inner = '<p class="hold">' + esc(tr.tie) + '</p>';
     } else {
       var t = S.types.filter(function (x) { return x.ks === m.ks.top; })[0];
-      inner = '<div class="type-big"><span>' + esc(tr.title) + '</span><strong>' + esc(m.ks.topName) + '</strong></div>' +
-        '<ul class="type-tags center">' + t.tags.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>';
+      inner = '<p class="type-eyebrow">' + esc(tr.title) + '</p>' + renderTypeCard(t, true, m.ks.contrib);
     }
-    return '<section class="panel type-result">' + label('KS-15 방식 참고 결과') + inner +
+    var detail = '<details class="fold"><summary>점수·유의사항 보기</summary><div class="fold-body">' +
+      (m.ks && !m.ks.tie ? '<table class="score-table"><thead><tr><th>유형</th><th>KS-15 가중치 합계</th></tr></thead><tbody>' +
+        S.ks15.labels.map(function (name, i) {
+          return '<tr' + (i === m.ks.top ? ' class="top"' : '') + '><th scope="row">' + esc(name) + '</th><td>' + m.ks.scores[i].toFixed(2) + '</td></tr>';
+        }).join('') + '</tbody></table><p class="body-text">점수는 확률이 아니며, 점수 차이가 작으면 판별이 덜 뚜렷할 수 있어요.</p>' : '') +
+      '<ul class="caveats">' + tr.caveats.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div></details>';
+    return '<section class="panel type-result">' + label('나의 결과') + inner +
       '<p class="body-text center">' + esc(tr.brief) + '</p>' + detail + '</section>';
   }
 
@@ -275,7 +291,7 @@
         S.reference.extra.map(function (x) { return '<p>' + esc(x) + '</p>'; }).join('') +
       '</section>';
 
-    return head + renderTypeResult(m) + renderGlance(m) + actions + detail + renderTypes(m.ks && m.ks.top !== null ? m.ks.top : null) + refs;
+    return head + renderTypeResult(m) + renderGlance(m) + actions + detail + renderOtherTypes(m) + refs;
   }
 
   /* ───────── 공통 ───────── */
@@ -343,7 +359,11 @@
     else if (act === 'prev') prev();
     else if (act === 'restart') restart();
     else if (act === 'edit') { state.view = 'q'; state.index = qs().length - 1; render(); }
-    else if (act === 'image') window.SurveyImage.open(R.build(state.answers));
+    else if (act === 'image') {
+      var mm = R.build(state.answers);
+      if (mm.ks && mm.ks.top !== null) mm.typeCard = S.types.filter(function (x) { return x.ks === mm.ks.top; })[0];
+      window.SurveyImage.open(mm);
+    }
   });
 
   // 노트북: 숫자키로 선택, ←/→ 로 이동

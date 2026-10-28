@@ -282,3 +282,12 @@ h1 { font-size: 2.5rem; line-height: 1.28; color: var(--green); font-weight: 800
   .st-fig .toon { max-width: 170px; }
   .st-label { font-size: 1rem; min-height: 3rem; }
 }
+
+/* 결과: 내 유형 카드 */
+.type-eyebrow { text-align: center; font-size: 1.15rem; font-weight: 800; color: var(--green-d); margin-bottom: -6px; }
+.st-table th { width: 5.2rem; }
+.st-table .chips { list-style: none; margin: 0; padding: 0; }
+.st-table .chip { font-size: 1rem; background: #e3f4ea; }
+.st-table .row-note { margin: 0 0 8px; font-size: 1rem; font-weight: 600; color: var(--muted); }
+.st-card.is-mine { box-shadow: none; border-color: #2b2b2b; }
+@media (max-width: 760px) { .st-table th { width: 4.2rem; font-size: 1.05rem; } }
