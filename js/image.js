@@ -2,7 +2,7 @@
 (function () {
   var S = window.SURVEY;
   var FONT = '"Pretendard","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif';
-  var C = { bg: '#f7f4ea', card: '#ffffff', green: '#17402f', ring: '#2e9e6e', soft: '#e2f2ea', line: '#e1dcc9', text: '#1c2a22', muted: '#55645a', tan: '#f3ecd6' };
+  var C = { bg: '#ffffff', card: '#f3f5f4', green: '#25985f', ring: '#2fb36d', soft: '#eef1ef', line: '#d9ddda', text: '#222926', muted: '#5c6560', tan: '#f6f1df' };
   var W = 1080, PAD = 56, INNER = W - PAD * 2;
 
   function wrap(ctx, text, maxW) {
@@ -57,7 +57,7 @@
     var summary = '본 문항 ' + m.total + '개 중 ' + m.answered + '개에 응답했어요. 미응답·‘잘 모르겠음’은 계산에서 제외했어요.';
     var sh = measure(summary, INNER - 208, 28, '500', 42) + 56;
     if (!dry) {
-      rr(ctx, PAD, y, INNER, sh, 28); ctx.fillStyle = C.card; ctx.fill(); ctx.strokeStyle = C.line; ctx.lineWidth = 2; ctx.stroke();
+      rr(ctx, PAD, y, INNER, sh, 16); ctx.fillStyle = C.card; ctx.fill();
       var cx = PAD + 28 + 70, cy = y + sh / 2;
       ctx.lineWidth = 14; ctx.strokeStyle = C.soft; ctx.beginPath(); ctx.arc(cx, cy, 52, 0, Math.PI * 2); ctx.stroke();
       ctx.strokeStyle = C.ring; ctx.lineCap = 'round'; ctx.beginPath(); ctx.arc(cx, cy, 52, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (m.answered / m.total)); ctx.stroke(); ctx.lineCap = 'butt';
@@ -92,7 +92,7 @@
           });
         }
         h += 28;
-        if (!dry) { rr(ctx, PAD, y, INNER, h, 28); ctx.fillStyle = C.card; ctx.fill(); ctx.strokeStyle = C.line; ctx.lineWidth = 2; ctx.stroke(); }
+        if (!dry) { ctx.fillStyle = C.line; ctx.fillRect(PAD, y, INNER, 2); }
         var top = y; y += 36;
         font('700', 28);
         var label = d.id + ' · ' + d.title;
@@ -163,7 +163,7 @@
     img = img || document.getElementById('preview-img');
     saveBtn = saveBtn || document.getElementById('img-save');
     helpEl = helpEl || document.getElementById('overlay-help');
-    var ready = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+    var ready = (document.fonts && document.fonts.load) ? Promise.all(['500 20px Pretendard', '700 20px Pretendard', '800 20px Pretendard'].map(function (f) { return document.fonts.load(f, '가'); })).catch(function () {}) : Promise.resolve();
     ready.then(function () {
       var cv = render(model);
       cv.toBlob(function (blob) {

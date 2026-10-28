@@ -14,7 +14,7 @@
   function optionsOf(q) { return q.options || S.scales[q.scale]; }
   function isOptional(q) { return !!(q.optional || q.skippable); }
   function answeredCount() { return Object.keys(state.answers).length; }
-  function label(text) { return '<div class="sec-label"><span>' + esc(text) + '</span></div>'; }
+  function label(text) { return '<h2 class="sec-label">' + esc(text) + '</h2>'; }
 
   /* 도넛 통계 원 (pct 0~1). pct가 null이면 테두리만 있는 원 */
   function ring(pct, big, small, cls) {
@@ -29,7 +29,7 @@
   /* 응답 정도를 보여주는 5칸 막대 (선택한 보기 번호만큼 채움) */
   function battery(level) {
     var h = '';
-    for (var i = 0; i < 5; i++) h += '<i class="' + (i <= level ? 'f' : '') + '"></i>';
+    for (var i = 4; i >= 0; i--) h += '<i class="' + (i <= level ? 'f' : '') + '"></i>';
     return '<span class="batt" aria-hidden="true">' + h + '</span>';
   }
 
@@ -37,18 +37,18 @@
   function renderStart() {
     var resume = answeredCount() > 0;
     var domains = S.sections.map(function (s) {
-      return '<li><span class="step-id">' + s.id + '</span><strong>' + esc(s.title) + '</strong>' + (s.optional ? '<em>선택</em>' : '') + '</li>';
+      return '<li><span class="dom-circle">' + s.id + '</span><strong>' + esc(s.title) + '</strong>' + (s.optional ? '<em>선택</em>' : '') + '</li>';
     }).join('');
     return '' +
       '<section class="panel hero">' +
-        label('Self Check') +
+        '<span class="eyebrow">참고용 설문</span>' +
         '<h1 tabindex="-1" id="view-title">나의 사상체질<br>관련 특성 알아보기</h1>' +
         '<p class="lead">평소 행동과 신체 상태를 돌아보는 참고용 설문입니다.</p>' +
         '<p class="notice"><strong>안내</strong>체질을 확정하는 검사가 아니며 의료적 진단을 대신하지 않습니다.</p>' +
       '</section>' +
 
       '<section class="panel">' +
-        label('Overview') +
+        label('이 설문은요') +
         '<div class="stats">' +
           ring(null, String(S.questions.length), '문항') +
           ring(null, '약 7분', '소요 시간') +
@@ -64,8 +64,8 @@
       '</section>' +
 
       '<section class="panel">' +
-        label('Domains') +
-        '<ul class="domain-pills" aria-label="설문 영역">' + domains + '</ul>' +
+        label('설문 영역') +
+        '<ul class="dom-circles" aria-label="설문 영역">' + domains + '</ul>' +
         '<div class="actions-col">' +
           '<button type="button" class="btn btn-primary btn-wide" data-act="start">' + (resume ? '이어서 하기' : '시작하기') + '</button>' +
           (resume ? '<button type="button" class="btn btn-ghost btn-wide" data-act="restart">처음부터 다시 하기</button>' : '') +
@@ -99,8 +99,9 @@
 
     return '' +
       '<section class="panel progress" aria-label="진행 상황">' +
-        ring(pct, (state.index + 1) + '/' + total, Math.round(pct * 100) + '%', 'ring-sm') +
-        '<div class="tl-wrap"><ol class="timeline">' + timeline + '</ol></div>' +
+        '<div class="progress-top"><strong>' + (state.index + 1) + ' / ' + total + '</strong><span>' + Math.round(pct * 100) + '% 진행</span></div>' +
+        '<div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="' + total + '" aria-valuenow="' + (state.index + 1) + '"><div class="bar-fill" style="width:' + (pct * 100) + '%"></div></div>' +
+        '<ol class="timeline">' + timeline + '</ol>' +
       '</section>' +
       '<section class="bubble-card">' +
         '<div class="tags"><span class="pill">' + sec.id + ' · ' + esc(sec.title) + '</span>' + (isOptional(q) ? '<span class="tag">선택 응답</span>' : '') + '</div>' +
@@ -141,7 +142,7 @@
         }).join('') + '</ul>' + (d.partial ? '<p class="small-note">응답이 부족한 일부 항목은 판단을 보류했어요.</p>' : '');
         return '<section class="panel domain">' +
           '<div class="domain-top">' + ring(d.answered / d.total, d.answered + '/' + d.total, '응답', 'ring-sm') +
-            '<div><span class="step-id">' + d.id + '</span><h2>' + esc(d.title) + '</h2></div></div>' +
+            '<div><span class="eyebrow">영역 ' + d.id + '</span><h2>' + esc(d.title) + '</h2></div></div>' +
           '<div class="flow flow-mini"><div class="flow-box">응답 ' + d.answered + '문항</div><div class="flow-arrow" aria-hidden="true"></div><div class="flow-box on">확인된 특성 ' + d.lines.length + '개</div></div>' +
           inner + '</section>';
       }).join('') + '</div>';
