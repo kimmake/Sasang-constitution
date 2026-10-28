@@ -191,8 +191,7 @@
     para(S.reference.citation, PAD, INNER, 24, '400', C.muted, 36);
     para(S.reference.url, PAD, INNER, 24, '400', C.muted, 36);
     y += 10;
-    para(S.reference.disclaimer, PAD, INNER, 24, '400', C.muted, 36);
-    y += 56;
+        y += 56;
     return y;
   }
 

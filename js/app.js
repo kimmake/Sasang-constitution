@@ -305,7 +305,6 @@
         '<h2>참고문헌</h2>' +
         '<p>' + esc(S.reference.citation) + '</p>' +
         '<p><a href="' + esc(S.reference.url) + '" target="_blank" rel="noopener noreferrer">' + esc(S.reference.url) + '</a></p>' +
-        '<p>' + esc(S.reference.disclaimer) + '</p>' +
         S.reference.extra.map(function (x) { return '<p>' + esc(x) + '</p>'; }).join('') +
       '</section>';
 
