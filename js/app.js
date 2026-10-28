@@ -144,8 +144,7 @@
     return '' +
       '<section class="panel hero">' +
         '<h1 tabindex="-1" id="view-title">나의 사상체질<br>관련 특성 알아보기</h1>' +
-        '<p class="lead">평소 행동과 신체 상태를 돌아보는 참고용 설문입니다.</p>' +
-        '<p class="notice"><strong>안내</strong>체질을 확정하는 검사가 아니며 의료적 진단을 대신하지 않습니다.</p>' +
+        '<p class="lead">평소 행동과 신체 상태를 돌아보는 간단한 설문입니다.</p>' +
       '</section>' +
 
       '<section class="panel">' +
@@ -231,14 +230,13 @@
       var t = S.types.filter(function (x) { return x.ks === m.ks.top; })[0];
       inner = '<p class="type-eyebrow">' + esc(tr.title) + '</p>' + renderTypeCard(t, true, m.ks.contrib);
     }
-    var detail = '<details class="fold"><summary>점수·유의사항 보기</summary><div class="fold-body">' +
-      (m.ks && !m.ks.tie ? '<table class="score-table"><thead><tr><th>유형</th><th>KS-15 가중치 합계</th></tr></thead><tbody>' +
+    var detail = m.ks && !m.ks.tie ? '<details class="fold"><summary>유형별 점수 보기</summary><div class="fold-body">' +
+      '<table class="score-table"><thead><tr><th>유형</th><th>KS-15 가중치 합계</th></tr></thead><tbody>' +
         S.ks15.labels.map(function (name, i) {
           return '<tr' + (i === m.ks.top ? ' class="top"' : '') + '><th scope="row">' + esc(name) + '</th><td>' + m.ks.scores[i].toFixed(2) + '</td></tr>';
-        }).join('') + '</tbody></table><p class="body-text">점수는 확률이 아니며, 점수 차이가 작으면 판별이 덜 뚜렷할 수 있어요.</p>' : '') +
-      '<ul class="caveats">' + tr.caveats.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div></details>';
+        }).join('') + '</tbody></table></div></details>' : '';
     return '<section class="panel type-result">' + label('나의 결과') + inner +
-      '<p class="body-text center">' + esc(tr.brief) + '</p>' + detail + '</section>';
+      detail + '</section>';
   }
 
   /* 한눈에 보기: 영역별 짧은 표현만 */

@@ -184,8 +184,7 @@
     }
 
     // 유의 문구 + 참고문헌
-    para('이 결과는 응답을 정리한 것이며, 좋고 나쁨이나 건강 여부를 나타내지 않습니다. 체질 판정이나 의료적 진단을 대신하지 않아요.', PAD, INNER, 27, '600', C.green, 42);
-    y += 20;
+        y += 20;
     if (!dry) { ctx.fillStyle = C.line; ctx.fillRect(PAD, y, INNER, 2); }
     y += 24;
     para('참고문헌', PAD, INNER, 26, '700', C.text, 38);
