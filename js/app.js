@@ -59,8 +59,7 @@
   }
 
   function renderTypes(topKs) {
-    return '<section class="panel types">' +
-      label(S.typesIntro.title) +
+    return '<details class="fold fold-card types"><summary>' + esc(S.typesIntro.title) + '</summary><div class="fold-body">' +
       '<p class="types-note">' + esc(S.typesIntro.note) + '</p>' +
       '<div class="type-grid">' + S.types.map(function (t) {
         var mine = topKs !== null && topKs !== undefined && t.ks === topKs;
@@ -68,7 +67,7 @@
           '<div class="type-body"><div class="type-fig">' + figure(t.figure) + '</div>' +
           '<ul class="type-tags">' + t.tags.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div>' +
           '<dl class="type-rows"><div><dt>체형</dt><dd>' + esc(t.build) + '</dd></div><div><dt>성격</dt><dd>' + esc(t.character) + '</dd></div></dl></article>';
-      }).join('') + '</div></section>';
+      }).join('') + '</div></div></details>';
   }
 
   /* ───────── 시작 ───────── */
@@ -160,23 +159,34 @@
   function renderTypeResult(m) {
     var tr = S.typeResult;
     var inner;
+    var detail = '<details class="fold"><summary>유의사항·점수 자세히 보기</summary><div class="fold-body">' +
+      (m.ks && !m.ks.tie ? '<table class="score-table"><thead><tr><th>유형</th><th>KS-15 가중치 합계</th></tr></thead><tbody>' +
+        S.ks15.labels.map(function (name, i) {
+          return '<tr' + (i === m.ks.top ? ' class="top"' : '') + '><th scope="row">' + esc(name) + '</th><td>' + m.ks.scores[i].toFixed(2) + '</td></tr>';
+        }).join('') + '</tbody></table><p class="body-text">점수는 확률이 아니며, 점수 차이가 작으면 판별이 덜 뚜렷할 수 있어요.</p>' : '') +
+      '<ul class="caveats">' + tr.caveats.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div></details>';
     if (!m.ks) {
       inner = '<p class="hold">' + esc(S.holdText.overall) + '</p>';
     } else if (m.ks.tie) {
       inner = '<p class="hold">' + esc(tr.tie) + '</p>';
     } else {
       var t = S.types.filter(function (x) { return x.ks === m.ks.top; })[0];
-      var rows = S.ks15.labels.map(function (name, i) {
-        return '<tr' + (i === m.ks.top ? ' class="top"' : '') + '><th scope="row">' + esc(name) + '</th><td>' + m.ks.scores[i].toFixed(2) + '</td></tr>';
-      }).join('');
-      inner = '<div class="type-big"><span>' + esc(tr.title) + '</span><strong>' + esc(m.ks.topName) + '</strong><em>참고용 · 확정이 아니에요</em></div>' +
-        '<ul class="type-tags center">' + t.tags.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' +
-        '<details class="scores"><summary>유형별 점수 보기</summary>' +
-          '<table><thead><tr><th>유형</th><th>KS-15 가중치 합계</th></tr></thead><tbody>' + rows + '</tbody></table>' +
-          '<p class="small-note">점수는 확률이 아니며, 점수 차이가 작으면 판별이 덜 뚜렷할 수 있어요.</p></details>';
+      inner = '<div class="type-big"><span>' + esc(tr.title) + '</span><strong>' + esc(m.ks.topName) + '</strong></div>' +
+        '<ul class="type-tags center">' + t.tags.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>';
     }
     return '<section class="panel type-result">' + label('KS-15 방식 참고 결과') + inner +
-      '<ul class="caveats">' + tr.caveats.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></section>';
+      '<p class="body-text center">' + esc(tr.brief) + '</p>' + detail + '</section>';
+  }
+
+  /* 한눈에 보기: 영역별 짧은 표현만 */
+  function renderGlance(m) {
+    if (m.holdAll) return '<section class="panel"><p class="hold">' + esc(S.holdText.overall) + '</p></section>';
+    var rows = m.domains.map(function (d) {
+      var chips = d.held ? '<span class="chip hold-chip">' + esc(S.holdText.domain) + '</span>'
+        : d.lines.map(function (l) { return '<span class="chip' + (l.kind === 'mixed' ? ' mixed' : '') + '">' + esc(l.short) + '</span>'; }).join('');
+      return '<div class="glance-row"><h3>' + esc(d.title) + '</h3><div class="chips">' + chips + '</div></div>';
+    }).join('');
+    return '<section class="panel glance">' + label('한눈에 보기') + '<div class="glance-list">' + rows + '</div>' + '</section>';
   }
 
   /* ───────── 결과 ───────── */
@@ -186,47 +196,38 @@
       '<section class="panel result-head">' +
         label('Result') +
         '<h1 tabindex="-1" id="view-title">내 응답 결과</h1>' +
-        '<p class="lead">답해 주신 내용으로 가까운 유형과 영역별 특성을 정리했어요.</p>' +
-        '<div class="stat-row">' + ring(m.answered / m.total, m.answered + '/' + m.total, '응답한 문항') +
-          '<p class="stat-text">' + (m.answered === m.total ? '본 문항 ' + m.total + '개에 <strong>모두 응답</strong>하셨어요.' : '본 문항 ' + m.total + '개 중 <strong>' + m.answered + '개</strong>에 응답하셨어요.<br>미응답은 계산에서 제외했어요.') + '<br><span>(최근 변화 확인 문항 제외)</span></p></div>' +
+        '<p class="lead">' + (m.answered === m.total ? '본 문항 ' + m.total + '개에 모두 응답하셨어요.' : '본 문항 ' + m.total + '개 중 ' + m.answered + '개에 응답하셨어요. 미응답은 계산에서 제외했어요.') + '</p>' +
         (m.recentChange ? '<p class="notice recent"><strong>안내</strong>' + esc(m.recentChange) + '</p>' : '') +
       '</section>';
 
-    var typePanel = renderTypeResult(m);
-
-    var body;
-    if (m.holdAll) {
-      body = '<section class="panel"><p class="hold">' + esc(S.holdText.overall) + '</p></section>';
-    } else {
-      body = '<div class="domain-grid">' + m.domains.map(function (d) {
+    var detail = '';
+    if (!m.holdAll) {
+      detail = '<details class="fold fold-card"><summary>영역별 자세한 문장 보기</summary><div class="fold-body"><div class="domain-grid">' + m.domains.map(function (d) {
         var inner;
         if (d.held) inner = '<p class="hold">' + esc(S.holdText.domain) + '</p>';
         else if (!d.lines.length) inner = '<p class="hold">' + esc(S.holdText.trait) + '</p>';
         else inner = '<ul class="quotes">' + d.lines.map(function (l) {
           return '<li class="quote ' + l.kind + '">' + (l.kind === 'mixed' ? '<em>상황에 따라 달라요</em>' : '') + esc(l.text) + '</li>';
         }).join('') + '</ul>' + (d.partial ? '<p class="small-note">응답이 부족한 일부 항목은 판단을 보류했어요.</p>' : '');
-        return '<section class="panel domain">' +
-          '<div class="domain-top">' + ring(d.answered / d.total, d.answered + '/' + d.total, '응답', 'ring-sm') +
-            '<div><span class="eyebrow">영역 ' + d.id + '</span><h2>' + esc(d.title) + '</h2></div></div>' +
-          '<div class="flow flow-mini"><div class="flow-box">응답 ' + d.answered + '문항</div><div class="flow-arrow" aria-hidden="true"></div><div class="flow-box on">확인된 특성 ' + d.lines.length + '개</div></div>' +
-          inner + '</section>';
-      }).join('') + '</div>';
+        return '<section class="domain"><div class="domain-top"><div><span class="eyebrow">영역 ' + d.id + ' · 응답 ' + d.answered + '/' + d.total + '</span><h2>' + esc(d.title) + '</h2></div></div>' + inner + '</section>';
+      }).join('') + '</div></div></details>';
     }
 
-    var foot = renderTypes(m.ks && m.ks.top !== null ? m.ks.top : null) +
-      '<section class="banner">이 결과는 응답을 정리한 것이며, 좋고 나쁨이나 건강 여부를 나타내지 않습니다. 체질 판정이나 의료적 진단을 대신하지 않아요. 몸 상태가 걱정되시면 전문가와 상담해 주세요.</section>' +
-      '<div class="actions">' +
+    var actions = '<div class="actions">' +
         '<button type="button" class="btn btn-primary" data-act="image">이미지로 저장하기</button>' +
         '<button type="button" class="btn btn-ghost" data-act="edit">답변 수정하기</button>' +
         '<button type="button" class="btn btn-ghost" data-act="restart">다시 하기</button>' +
-      '</div>' +
-      '<section class="refs">' +
+      '</div>';
+
+    var refs = '<section class="refs">' +
         '<h2>참고문헌</h2>' +
-        '<p>' + esc(S.reference.citation) + '<br><a href="' + esc(S.reference.url) + '" target="_blank" rel="noopener noreferrer">' + esc(S.reference.url) + '</a></p>' +
-        '<p class="disclaimer">' + esc(S.reference.disclaimer) + '</p>' +
-        '<ul class="ref-extra">' + S.reference.extra.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' +
+        '<p>' + esc(S.reference.citation) + '</p>' +
+        '<p><a href="' + esc(S.reference.url) + '" target="_blank" rel="noopener noreferrer">' + esc(S.reference.url) + '</a></p>' +
+        '<p>' + esc(S.reference.disclaimer) + '</p>' +
+        S.reference.extra.map(function (x) { return '<p>' + esc(x) + '</p>'; }).join('') +
       '</section>';
-    return head + typePanel + (m.holdAll ? '' : '<div class="sec-gap">' + label('응답에서 확인된 특성') + '</div>') + body + foot;
+
+    return head + renderTypeResult(m) + renderGlance(m) + actions + detail + renderTypes(m.ks && m.ks.top !== null ? m.ks.top : null) + refs;
   }
 
   /* ───────── 공통 ───────── */

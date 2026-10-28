@@ -150,10 +150,6 @@ h1 { font-size: 2.5rem; line-height: 1.28; color: var(--green); font-weight: 800
 .small-note { font-size: 1rem; color: var(--muted); }
 .banner { margin-top: 30px; background: var(--pale); border-radius: 12px; padding: 20px 24px; font-weight: 700; color: var(--green-d); font-size: 1.15rem; }
 .actions { display: grid; gap: 12px; padding: 30px 0; }
-.refs { display: grid; gap: 10px; padding-top: 8px; border-top: 1px solid var(--line); }
-.refs h2 { font-size: 1.1rem; padding-top: 22px; }
-.refs p { font-size: 1rem; color: var(--muted); line-height: 1.7; word-break: break-all; }
-.refs .disclaimer { word-break: keep-all; }
 
 .overlay { position: fixed; inset: 0; background: rgba(20, 30, 25, .6); display: grid; place-items: center; padding: 16px; z-index: 30; }
 .overlay[hidden] { display: none; }
@@ -226,5 +222,40 @@ h1 { font-size: 2.5rem; line-height: 1.28; color: var(--green); font-weight: 800
 .sec-gap { padding: 36px 0 0; }
 .type-card.is-mine { border-width: 4px; }
 .mine { display: block; font-size: .85rem; font-weight: 700; background: #fff; color: var(--green-d); border-radius: 999px; width: max-content; margin: 4px auto 0; padding: 0 .8rem; }
-.ref-extra { margin: 6px 0 0; padding-left: 1.1rem; }
-.ref-extra li { margin-bottom: 4px; word-break: keep-all; }
+
+/* 출처: 모든 줄이 같은 글꼴·크기·색 */
+.refs { display: grid; gap: 8px; padding: 28px 0 8px; border-top: 1px solid var(--line); font-family: var(--font); font-size: 1.05rem; line-height: 1.7; color: var(--muted); font-weight: 400; }
+.refs h2 { font-size: 1.05rem; font-weight: 800; color: var(--text); }
+.refs p, .refs a { font: inherit; color: inherit; margin: 0; word-break: keep-all; overflow-wrap: anywhere; }
+.refs a { text-decoration: underline; }
+
+/* 접이식 */
+.fold { border: 2px solid var(--line); border-radius: 12px; background: #fff; }
+.fold > summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 60px; padding: .6rem 1.1rem; font-weight: 800; font-size: 1.2rem; color: var(--green-d); }
+.fold > summary::-webkit-details-marker { display: none; }
+.fold > summary::after { content: ""; width: 12px; height: 12px; border-right: 3px solid var(--green); border-bottom: 3px solid var(--green); transform: rotate(45deg); transition: transform .15s; margin: -4px 4px 0 0; flex: none; }
+.fold[open] > summary::after { transform: rotate(-135deg); margin-top: 4px; }
+.fold[open] > summary { border-bottom: 2px solid var(--line); }
+.fold-body { padding: 18px 18px 20px; display: grid; gap: 14px; }
+.fold-card { margin-top: 4px; }
+
+.body-text { font-size: 1.1rem; color: var(--muted); }
+.body-text.center { text-align: center; }
+.score-table { width: 100%; border-collapse: collapse; font-size: 1.1rem; }
+.score-table th, .score-table td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); }
+.score-table td { text-align: right; font-variant-numeric: tabular-nums; }
+.score-table tr.top th, .score-table tr.top td { color: var(--green-d); font-weight: 800; }
+
+/* 한눈에 보기 */
+.glance-list { display: grid; gap: 14px; }
+.glance-row { display: grid; grid-template-columns: 8.5rem 1fr; gap: 8px 14px; align-items: start; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+.glance-row:last-child { border-bottom: 0; padding-bottom: 0; }
+.glance-row h3 { margin: 0; font-size: 1.15rem; font-weight: 800; color: var(--text); line-height: 1.9; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { background: var(--pale); color: var(--green-d); border-radius: 999px; padding: .15rem .9rem; font-size: 1.05rem; font-weight: 700; line-height: 1.6; }
+.chip.mixed { background: #fff; border: 2px dashed #c7b46a; color: #7d6a22; }
+.chip.hold-chip { background: var(--gray); color: var(--muted); font-weight: 500; }
+@media (max-width: 560px) { .glance-row { grid-template-columns: 1fr; } .glance-row h3 { line-height: 1.5; } }
+.domain-grid { gap: 22px; }
+.domain-grid .domain { padding: 0 0 18px; border-bottom: 1px solid var(--line); }
+.type-result .type-tags { margin-top: 0; }

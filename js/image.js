@@ -28,7 +28,19 @@
   }
 
   // dry=true 이면 높이만 계산
+  // 영역별 짧은 표현을 한 문장으로 묶어 이미지를 간결하게 만듭니다
+  function condense(m) {
+    var c = Object.assign({}, m);
+    c.domains = m.domains.map(function (d) {
+      var d2 = Object.assign({}, d);
+      d2.lines = d.held || !d.lines.length ? [] : [{ text: d.lines.map(function (l) { return l.short || l.text; }).join('  ·  '), kind: 'single' }];
+      return d2;
+    });
+    return c;
+  }
+
   function paint(ctx, m, dry) {
+    m = condense(m);
     var y = 0;
     function font(w, s) { ctx.font = w + ' ' + s + 'px ' + FONT; }
     function para(text, x, maxW, size, weight, color, lh) {
@@ -71,8 +83,8 @@
     // KS-15 방식 참고 결과 (확률·정확도 수치 없음)
     if (m.ks) {
       var kt = m.ks.tie ? S.typeResult.tie : null;
-      var cav = S.typeResult.caveats.slice(0, 3).join(' ');
-      var bh = (kt ? measure(kt, INNER - 56, 30, '600', 46) + 40 : 40 + 38 + 96 + 16) + measure(cav, INNER - 56, 24, '400', 36) + 56;
+      var cav = S.typeResult.brief;
+      var bh = (kt ? measure(kt, INNER - 56, 30, '600', 46) + 40 : 156) + measure(cav, INNER - 56, 24, '400', 36) + 56;
       if (!dry) { rr(ctx, PAD, y, INNER, bh, 20); ctx.fillStyle = C.green; ctx.fill(); }
       var by0 = y; y += 28;
       if (kt) {

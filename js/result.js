@@ -35,7 +35,7 @@
       var cq = qById[trait.choice.q];
       var cv = answers[cq.id];
       if (!isAnswered(cq, cv)) return { held: true, skipped: true };
-      return { held: false, kind: 'single', text: trait.text[cv] };
+      return { held: false, kind: 'single', text: trait.text[cv], short: trait.short && trait.short[cv] };
     }
     var vals = [];
     trait.items.forEach(function (it) {
@@ -49,7 +49,7 @@
     if (vals.length >= 2 && hasHigh && hasLow && trait.text.mixed) return { held: false, kind: 'mixed', text: trait.text.mixed };
     var mean = vals.reduce(function (a, b) { return a + b; }, 0) / vals.length;
     var kind = mean >= T.high ? 'high' : mean <= T.low ? 'low' : 'mid';
-    return { held: false, kind: kind, text: trait.text[kind] };
+    return { held: false, kind: kind, text: trait.text[kind], short: trait.short && trait.short[kind] };
   }
 
   /*
@@ -93,7 +93,7 @@
           var r = checkTrait(t, answers);
           if (r.skipped) return;
           if (r.held) { partial = true; return; }
-          lines.push({ text: r.text, kind: r.kind });
+          lines.push({ text: r.text, short: r.short || r.text, kind: r.kind });
         });
       }
       return { id: s.id, title: s.title, total: qs.length, answered: n, held: held, lines: lines, partial: partial };
