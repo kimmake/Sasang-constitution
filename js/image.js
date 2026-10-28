@@ -2,7 +2,7 @@
 (function () {
   var S = window.SURVEY;
   var FONT = '"Pretendard","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif';
-  var C = { bg: '#f6f1e4', card: '#fffdf7', green: '#1f4d3a', soft: '#e3ece3', line: '#d9d0b8', text: '#1d2a22', muted: '#55635a', tan: '#f0e8d2' };
+  var C = { bg: '#f7f4ea', card: '#ffffff', green: '#17402f', ring: '#2e9e6e', soft: '#e2f2ea', line: '#e1dcc9', text: '#1c2a22', muted: '#55645a', tan: '#f3ecd6' };
   var W = 1080, PAD = 56, INNER = W - PAD * 2;
 
   function wrap(ctx, text, maxW) {
@@ -60,7 +60,7 @@
       rr(ctx, PAD, y, INNER, sh, 28); ctx.fillStyle = C.card; ctx.fill(); ctx.strokeStyle = C.line; ctx.lineWidth = 2; ctx.stroke();
       var cx = PAD + 28 + 70, cy = y + sh / 2;
       ctx.lineWidth = 14; ctx.strokeStyle = C.soft; ctx.beginPath(); ctx.arc(cx, cy, 52, 0, Math.PI * 2); ctx.stroke();
-      ctx.strokeStyle = C.green; ctx.lineCap = 'round'; ctx.beginPath(); ctx.arc(cx, cy, 52, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (m.answered / m.total)); ctx.stroke(); ctx.lineCap = 'butt';
+      ctx.strokeStyle = C.ring; ctx.lineCap = 'round'; ctx.beginPath(); ctx.arc(cx, cy, 52, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (m.answered / m.total)); ctx.stroke(); ctx.lineCap = 'butt';
       ctx.fillStyle = C.green; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; font('800', 32); ctx.fillText(m.answered + '/' + m.total, cx, cy); ctx.textAlign = 'left';
     }
     var sy = y; y += 28;
@@ -100,7 +100,11 @@
         if (!dry) {
           rr(ctx, PAD + 32, y, lw, 52, 26); ctx.fillStyle = C.soft; ctx.fill();
           ctx.fillStyle = C.green; ctx.textBaseline = 'middle'; ctx.fillText(label, PAD + 52, y + 27);
-          font('500', 26); ctx.fillStyle = C.muted; ctx.textAlign = 'right'; ctx.fillText('응답 ' + d.answered + '/' + d.total, PAD + INNER - 32, y + 27); ctx.textAlign = 'left';
+          var rx = PAD + INNER - 32 - 34, ry = y + 26;
+          ctx.lineWidth = 9; ctx.strokeStyle = C.soft; ctx.beginPath(); ctx.arc(rx, ry, 26, 0, Math.PI * 2); ctx.stroke();
+          ctx.strokeStyle = C.ring; ctx.lineCap = 'round'; ctx.beginPath(); ctx.arc(rx, ry, 26, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * (d.answered / d.total)); ctx.stroke(); ctx.lineCap = 'butt';
+          font('800', 19); ctx.fillStyle = C.green; ctx.textAlign = 'center'; ctx.fillText(d.answered + '/' + d.total, rx, ry + 1); ctx.textAlign = 'left';
+          font('500', 24); ctx.fillStyle = C.muted; ctx.textAlign = 'right'; ctx.fillText('응답', rx - 44, y + 27); ctx.textAlign = 'left';
         }
         y += 52 + 22;
         if (d.held || !d.lines.length) {
@@ -110,7 +114,7 @@
             var th = items[i];
             if (!dry) {
               rr(ctx, PAD + 32, y, INNER - 64, th, 20); ctx.fillStyle = l.kind === 'mixed' ? C.tan : C.soft; ctx.fill();
-              ctx.fillStyle = l.kind === 'mixed' ? '#b29b5a' : C.green; ctx.fillRect(PAD + 32, y + 14, 8, th - 28);
+              ctx.fillStyle = l.kind === 'mixed' ? '#b29b5a' : C.ring; ctx.fillRect(PAD + 32, y + 14, 8, th - 28);
             }
             var by = y; y += 18;
             para(l.text, PAD + 32 + 28, INNER - 64 - 44, 30, '500', C.text, 46);
