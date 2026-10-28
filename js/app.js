@@ -33,6 +33,42 @@
     return '<span class="batt" aria-hidden="true">' + h + '</span>';
   }
 
+
+  /* 유형 개념도 (평면 일러스트, 비율만 다르게 그림) */
+  function figure(f) {
+    var cx = 60, skin = '#f6d9b8', pants = '#2f6f50', hair = '#2b2b2b';
+    var shY = 64, waY = 108, hiY = 128, bottom = 190;
+    var torso = [[cx - f.sh / 2, shY], [cx + f.sh / 2, shY], [cx + f.wa / 2, waY], [cx + f.hi / 2, hiY], [cx - f.hi / 2, hiY], [cx - f.wa / 2, waY]]
+      .map(function (p) { return p[0] + ',' + p[1]; }).join(' ');
+    var legGap = Math.max(4, f.hi * 0.12), lx1 = cx - legGap / 2 - f.leg, lx2 = cx + legGap / 2;
+    return '<svg class="fig" viewBox="0 0 120 200" role="img" aria-hidden="true">' +
+      '<g transform="translate(60 190) scale(' + f.scale + ') translate(-60 -190)">' +
+      '<line x1="' + (cx - f.sh / 2 + 4) + '" y1="' + (shY + 6) + '" x2="' + (cx - f.sh / 2 - 2) + '" y2="122" stroke="' + skin + '" stroke-width="9" stroke-linecap="round"/>' +
+      '<line x1="' + (cx + f.sh / 2 - 4) + '" y1="' + (shY + 6) + '" x2="' + (cx + f.sh / 2 + 2) + '" y2="122" stroke="' + skin + '" stroke-width="9" stroke-linecap="round"/>' +
+      '<rect x="' + lx1 + '" y="' + (hiY - 4) + '" width="' + f.leg + '" height="' + (bottom - hiY + 4) + '" rx="' + (f.leg / 2.5) + '" fill="' + skin + '"/>' +
+      '<rect x="' + lx2 + '" y="' + (hiY - 4) + '" width="' + f.leg + '" height="' + (bottom - hiY + 4) + '" rx="' + (f.leg / 2.5) + '" fill="' + skin + '"/>' +
+      '<rect x="' + (cx - f.hi / 2) + '" y="' + (hiY - 14) + '" width="' + f.hi + '" height="22" rx="6" fill="' + pants + '"/>' +
+      '<polygon points="' + torso + '" fill="' + f.shirt + '" stroke="' + f.shirt + '" stroke-width="8" stroke-linejoin="round"/>' +
+      '<rect x="' + (cx - f.neck / 2) + '" y="' + (shY - 16) + '" width="' + f.neck + '" height="22" fill="' + skin + '"/>' +
+      '<circle cx="' + cx + '" cy="' + (shY - 16 - f.head + 6) + '" r="' + f.head + '" fill="' + skin + '"/>' +
+      '<path d="M' + (cx - f.head) + ' ' + (shY - 16 - f.head + 2) + ' A' + f.head + ' ' + f.head + ' 0 0 1 ' + (cx + f.head) + ' ' + (shY - 16 - f.head + 2) + ' Q' + cx + ' ' + (shY - 16 - f.head - 4) + ' ' + (cx - f.head) + ' ' + (shY - 16 - f.head + 2) + 'Z" fill="' + hair + '"/>' +
+      '<circle cx="' + (cx - f.head * 0.35) + '" cy="' + (shY - 16 - f.head + 8) + '" r="1.8" fill="#333"/><circle cx="' + (cx + f.head * 0.35) + '" cy="' + (shY - 16 - f.head + 8) + '" r="1.8" fill="#333"/>' +
+      '<path d="M' + (cx - 4) + ' ' + (shY - 16 - f.head + 14) + ' Q' + cx + ' ' + (shY - 16 - f.head + 18) + ' ' + (cx + 4) + ' ' + (shY - 16 - f.head + 14) + '" stroke="#333" stroke-width="1.6" fill="none" stroke-linecap="round"/>' +
+      '</g></svg>';
+  }
+
+  function renderTypes() {
+    return '<section class="panel types">' +
+      label(S.typesIntro.title) +
+      '<p class="types-note">' + esc(S.typesIntro.note) + '</p>' +
+      '<div class="type-grid">' + S.types.map(function (t) {
+        return '<article class="type-card"><h3>' + esc(t.name) + '</h3>' +
+          '<div class="type-body"><div class="type-fig">' + figure(t.figure) + '</div>' +
+          '<ul class="type-tags">' + t.tags.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div>' +
+          '<dl class="type-rows"><div><dt>체형</dt><dd>' + esc(t.build) + '</dd></div><div><dt>성격</dt><dd>' + esc(t.character) + '</dd></div></dl></article>';
+      }).join('') + '</div></section>';
+  }
+
   /* ───────── 시작 ───────── */
   function renderStart() {
     var resume = answeredCount() > 0;
@@ -148,7 +184,7 @@
       }).join('') + '</div>';
     }
 
-    var foot = '' +
+    var foot = renderTypes() +
       '<section class="banner">이 결과는 응답을 정리한 것이며, 좋고 나쁨이나 건강 여부를 나타내지 않습니다. 체질 판정이나 의료적 진단을 대신하지 않아요. 몸 상태가 걱정되시면 전문가와 상담해 주세요.</section>' +
       '<div class="actions">' +
         '<button type="button" class="btn btn-primary" data-act="image">이미지로 저장하기</button>' +

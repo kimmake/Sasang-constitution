@@ -191,3 +191,20 @@ h1 { font-size: 2.5rem; line-height: 1.28; color: var(--green); font-weight: 800
   .opt { font-size: 1.2rem; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* 사상체질 네 가지 유형 */
+.types-note { background: var(--gray); border-radius: 10px; padding: 14px 18px; font-size: 1.05rem; color: var(--muted); }
+.type-grid { display: grid; gap: 22px; }
+.type-card { border: 2px solid var(--green); border-radius: 14px; overflow: hidden; background: #fff; display: grid; }
+.type-card h3 { margin: 0; background: var(--green); color: #fff; text-align: center; font-size: 1.6rem; padding: 10px; font-weight: 800; }
+.type-body { display: grid; grid-template-columns: 150px 1fr; gap: 12px; align-items: center; padding: 16px; background: var(--pale); min-height: 250px; }
+.type-fig { align-self: end; }
+.fig { width: 100%; height: auto; display: block; }
+.type-tags { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.type-tags li { background: #fff; border: 2px solid var(--pale-2); border-radius: 999px; padding: .2rem .9rem; font-weight: 700; font-size: 1.05rem; color: var(--green-d); }
+.type-rows { margin: 0; display: grid; }
+.type-rows > div { display: grid; grid-template-columns: 76px 1fr; border-top: 2px solid var(--green); }
+.type-rows dt { background: var(--pale); color: var(--green-d); font-weight: 800; display: grid; place-items: center; border-right: 2px solid var(--green); font-size: 1.1rem; }
+.type-rows dd { margin: 0; padding: 14px 16px; font-size: 1.1rem; line-height: 1.6; }
+@media (min-width: 900px) { .type-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 420px) { .type-body { grid-template-columns: 110px 1fr; } .type-rows > div { grid-template-columns: 60px 1fr; } }
