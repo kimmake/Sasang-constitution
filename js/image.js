@@ -54,7 +54,7 @@
     y += 24;
 
     // 응답 현황
-    var summary = '본 문항 ' + m.total + '개 중 ' + m.answered + '개에 응답했어요. 미응답·‘잘 모르겠음’은 계산에서 제외했어요.';
+    var summary = m.answered === m.total ? '본 문항 ' + m.total + '개에 모두 응답했어요.' : '본 문항 ' + m.total + '개 중 ' + m.answered + '개에 응답했어요. 미응답은 계산에서 제외했어요.';
     var sh = measure(summary, INNER - 208, 28, '500', 42) + 56;
     if (!dry) {
       rr(ctx, PAD, y, INNER, sh, 16); ctx.fillStyle = C.card; ctx.fill();

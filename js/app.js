@@ -87,7 +87,7 @@
         label('이 설문은요') +
         '<div class="stats">' +
           ring(null, String(S.questions.length), '문항') +
-          ring(null, '약 7분', '소요 시간') +
+          ring(null, '약 5분', '소요 시간') +
           ring(null, '0건', '서버 저장') +
         '</div>' +
         '<div class="flow" aria-label="진행 순서">' +
@@ -161,7 +161,7 @@
         '<h1 tabindex="-1" id="view-title">내 응답에서 확인된 특성</h1>' +
         '<p class="lead">체질을 확정하지 않고, 답해 주신 내용을 영역별로 정리했어요.</p>' +
         '<div class="stat-row">' + ring(m.answered / m.total, m.answered + '/' + m.total, '응답한 문항') +
-          '<p class="stat-text">본 문항 ' + m.total + '개 중 <strong>' + m.answered + '개</strong>에 응답하셨어요.<br>미응답·‘잘 모르겠음’은 계산에서 제외했어요.<br><span>(최근 변화 확인 문항 제외)</span></p></div>' +
+          '<p class="stat-text">' + (m.answered === m.total ? '본 문항 ' + m.total + '개에 <strong>모두 응답</strong>하셨어요.' : '본 문항 ' + m.total + '개 중 <strong>' + m.answered + '개</strong>에 응답하셨어요.<br>미응답은 계산에서 제외했어요.') + '<br><span>(최근 변화 확인 문항 제외)</span></p></div>' +
         (m.recentChange ? '<p class="notice recent"><strong>안내</strong>' + esc(m.recentChange) + '</p>' : '') +
       '</section>';
 

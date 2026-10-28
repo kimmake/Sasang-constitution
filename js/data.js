@@ -4,6 +4,7 @@
  * - scales      : 공통 응답 보기
  * - sections    : 영역(A~E) 정의
  * - questions   : 문항. id는 번호, section은 영역, scale 또는 options 중 하나를 사용
+ *     (모든 문항은 필수 응답입니다. 건너뛰기가 필요하면 skippable:true 를 문항에 추가하세요)
  *     skippable      true  → "잘 모르겠음 / 응답하지 않음" 버튼을 추가로 보여주고, 답하지 않아도 넘어갈 수 있음
  *     optional       true  → 답하지 않아도 넘어갈 수 있음
  *     unanswerable   [i]   → options 중 "응답 없음"으로 취급할 보기 번호
@@ -28,7 +29,7 @@ window.SURVEY = {
     freq: ['전혀 없다', '드물다', '가끔 있다', '자주 있다', '거의 항상 있다']
   },
 
-  skipLabel: '잘 모르겠음 / 응답하지 않음',
+  skipLabel: '잘 모르겠음 / 응답하지 않음', // skippable 문항을 쓸 때만 표시됨
 
   baseInstruction: '일시적으로 아픈 날을 제외하고, 평소 자신의 모습을 기준으로 답해주세요.',
 
@@ -37,122 +38,92 @@ window.SURVEY = {
     { id: 'B', title: '소화·식사' },
     { id: 'C', title: '땀·온도' },
     { id: 'D', title: '수면·생활 리듬' },
-    { id: 'E', title: '최근 변화 확인', optional: true, instruction: '이 영역은 선택 응답입니다. 답하지 않아도 괜찮아요. 구체적인 질환명이나 복용약은 묻지 않습니다.' }
+    { id: 'E', title: '최근 변화 확인', instruction: '최근의 상태를 기준으로 답해주세요. 구체적인 질환명이나 복용약은 묻지 않습니다.' }
   ],
 
   questions: [
     // A. 행동·대인관계
     { id: 1, section: 'A', scale: 'agree', text: '낯선 사람에게 먼저 말을 거는 편이다.' },
-    { id: 2, section: 'A', scale: 'agree', text: '여러 사람과 함께하는 활동을 즐긴다.' },
-    { id: 3, section: 'A', scale: 'agree', text: '새로운 일을 시작할 때 망설임이 적다.' },
-    { id: 4, section: 'A', scale: 'agree', text: '결정을 내리기 전에 여러 가능성을 충분히 검토한다.' },
-    { id: 5, section: 'A', scale: 'agree', text: '일을 할 때 작은 부분까지 확인하는 편이다.' },
-    { id: 6, section: 'A', scale: 'agree', text: '예상하지 못한 변화에 빠르게 적응한다.' },
-    { id: 7, section: 'A', scale: 'agree', text: '자신의 의견을 다른 사람에게 분명하게 표현한다.' },
-    { id: 8, section: 'A', scale: 'agree', skippable: true, text: '감정이 표정이나 말투에 쉽게 드러난다.' },
-    { id: 9, section: 'A', scale: 'agree', skippable: true, text: '화가 나거나 흥분한 뒤 진정하는 데 시간이 걸린다.' },
-    { id: 10, section: 'A', scale: 'agree', text: '시작한 일을 일정한 속도로 꾸준히 이어간다.' },
-    { id: 11, section: 'A', scale: 'agree', text: '평소 행동이 빠른 편이다.' },
+    { id: 2, section: 'A', scale: 'agree', text: '새로운 일을 시작할 때 망설임이 적다.' },
+    { id: 3, section: 'A', scale: 'agree', text: '결정을 내리기 전에 여러 가능성을 충분히 검토한다.' },
+    { id: 4, section: 'A', scale: 'agree', text: '예상하지 못한 변화에 빠르게 적응한다.' },
+    { id: 5, section: 'A', scale: 'agree', text: '자신의 의견을 다른 사람에게 분명하게 표현한다.' },
+    { id: 6, section: 'A', scale: 'agree', text: '화가 나거나 흥분한 뒤 진정하는 데 시간이 걸린다.' },
 
     // B. 소화·식사
-    { id: 12, section: 'B', scale: 'freq', skippable: true, text: '식사 후 속이 더부룩하다.' },
-    { id: 13, section: 'B', scale: 'freq', skippable: true, text: '적은 양을 먹어도 금방 배가 부르다.' },
-    { id: 14, section: 'B', scale: 'freq', skippable: true, text: '식사 시간이 되어도 배고픔을 잘 느끼지 못한다.' },
-    { id: 15, section: 'B', scale: 'freq', skippable: true, text: '평소 먹는 양의 식사를 하고도 속이 불편하다.' },
-    { id: 16, section: 'B', scale: 'freq', skippable: true, text: '긴장하거나 스트레스를 받으면 소화 상태가 달라진다.' },
+    { id: 7, section: 'B', scale: 'freq', text: '식사 후 속이 더부룩하다.' },
+    { id: 8, section: 'B', scale: 'freq', text: '적은 양을 먹어도 금방 배가 부르다.' },
+    { id: 9, section: 'B', scale: 'freq', text: '긴장하거나 스트레스를 받으면 소화 상태가 달라진다.' },
 
     // C. 땀·온도
-    { id: 17, section: 'C', scale: 'agree', text: '가벼운 활동만 해도 땀이 쉽게 난다.' },
-    { id: 18, section: 'C', scale: 'agree', text: '더운 날에도 땀이 적게 나는 편이다.' },
-    { id: 19, section: 'C', scale: 'agree', skippable: true, text: '땀을 많이 흘린 뒤 기운이 떨어진다.' },
-    { id: 20, section: 'C', scale: 'agree', skippable: true, text: '땀을 흘리고 나면 몸이 가벼워진다.' },
-    { id: 21, section: 'C', scale: 'agree', text: '주변 사람들보다 추위를 많이 탄다.' },
-    { id: 22, section: 'C', scale: 'agree', text: '주변 사람들보다 더위를 많이 탄다.' },
-    { id: 23, section: 'C', scale: 'agree', skippable: true, text: '손이나 발이 차갑게 느껴지는 경우가 많다.' },
-    { id: 24, section: 'C', options: ['찬물', '미지근한 물', '따뜻한 물', '특별한 선호 없음'], text: '평소 마시는 물의 온도는 무엇을 선호하나요?' },
+    { id: 10, section: 'C', scale: 'agree', text: '가벼운 활동만 해도 땀이 쉽게 난다.' },
+    { id: 11, section: 'C', scale: 'agree', text: '더운 날에도 땀이 적게 나는 편이다.' },
+    { id: 12, section: 'C', scale: 'agree', text: '땀을 많이 흘린 뒤 기운이 떨어진다.' },
+    { id: 13, section: 'C', scale: 'agree', text: '주변 사람들보다 추위를 많이 탄다.' },
+    { id: 14, section: 'C', scale: 'agree', text: '주변 사람들보다 더위를 많이 탄다.' },
+    { id: 15, section: 'C', options: ['찬물', '미지근한 물', '따뜻한 물', '특별한 선호 없음'], text: '평소 마시는 물의 온도는 무엇을 선호하나요?' },
 
     // D. 수면·생활 리듬
-    { id: 25, section: 'D', options: ['규칙적인 편이다', '일정하지 않은 편이다', '잘 모르겠다'], unanswerable: [2], text: '평소 배변이 규칙적인 편인가요?' },
-    { id: 26, section: 'D', scale: 'freq', skippable: true, text: '잠든 뒤 중간에 자주 깨나요?' },
-    { id: 27, section: 'D', scale: 'freq', skippable: true, text: '충분히 잘 기회가 있었는데도 아침에 개운하지 않나요?' },
+    { id: 16, section: 'D', options: ['규칙적인 편이다', '일정하지 않은 편이다'], text: '평소 배변이 규칙적인 편인가요?' },
+    { id: 17, section: 'D', scale: 'freq', text: '잠든 뒤 중간에 자주 깨나요?' },
+    { id: 18, section: 'D', scale: 'freq', text: '충분히 잘 기회가 있었는데도 아침에 개운하지 않나요?' },
 
-    // E. 최근 변화 확인 (선택 응답)
-    { id: 28, section: 'E', optional: true, options: ['없음', '있음', '응답하지 않음'], unanswerable: [2], text: '최근 들어 평소와 달라진 신체 증상이 있나요?' },
-    { id: 29, section: 'E', optional: true, options: ['없음', '있음', '응답하지 않음'], unanswerable: [2], text: '최근 수면·식사·운동 습관이 크게 달라졌나요?' }
+    // E. 최근 변화 확인
+    { id: 19, section: 'E', options: ['없음', '있음'], text: '최근 들어 평소와 달라진 신체 증상이 있나요?' },
+    { id: 20, section: 'E', options: ['없음', '있음'], text: '최근 수면·식사·운동 습관이 크게 달라졌나요?' }
   ],
 
   // 최근 변화 안내를 띄우는 문항과 "있음" 보기 번호
-  recentChange: { questions: [28, 29], yesIndex: 1, notice: '최근 상태 변화가 답변에 영향을 주었을 수 있습니다.' },
+  recentChange: { questions: [19, 20], yesIndex: 1, notice: '최근 상태 변화가 답변에 영향을 주었을 수 있습니다.' },
 
   traits: [
     // ── A. 행동·대인관계
-    { id: 'a-social', section: 'A', items: [{ q: 1 }, { q: 2 }, { q: 3 }],
+    { id: 'a-social', section: 'A', items: [{ q: 1 }, { q: 2 }],
       text: {
-        high: '낯선 사람에게 먼저 다가가고, 여럿이 함께하고, 새로운 일을 시작하는 데 적극적이라고 응답했어요.',
-        mid: '먼저 말을 걸거나, 여럿이 함께하거나, 새로운 일을 시작하는 정도는 보통이라고 응답했어요.',
-        low: '먼저 말을 걸거나, 여럿이 함께하거나, 새로운 일을 시작하는 일은 많지 않다고 응답했어요.',
-        mixed: '먼저 다가가기, 함께하기, 새로 시작하기는 상황에 따라 다르게 나타나는 편이에요.'
+        high: '낯선 사람에게 먼저 말을 걸고 새로운 일을 시작하는 데 적극적이라고 응답했어요.',
+        mid: '먼저 말을 걸거나 새로운 일을 시작하는 정도는 보통이라고 응답했어요.',
+        low: '먼저 말을 걸거나 새로운 일을 시작하는 일은 많지 않다고 응답했어요.',
+        mixed: '먼저 말 걸기와 새로 시작하기는 상황에 따라 다르게 나타나는 편이에요.'
       } },
-    { id: 'a-careful', section: 'A', items: [{ q: 4 }, { q: 5 }],
+    { id: 'a-careful', section: 'A', items: [{ q: 3 }],
       text: {
-        high: '결정 전에 여러 가능성을 살피고 작은 부분까지 확인하는 편이라고 응답했어요.',
-        mid: '결정 전 검토나 세부 확인은 보통 정도라고 응답했어요.',
-        low: '결정 전 검토나 세부 확인에 많은 시간을 쓰지는 않는다고 응답했어요.',
-        mixed: '결정 전 검토와 세부 확인은 상황에 따라 다르게 나타나는 편이에요.'
+        high: '결정 전에 여러 가능성을 충분히 살피는 편이라고 응답했어요.',
+        mid: '결정 전 검토는 보통 정도라고 응답했어요.',
+        low: '결정 전에 여러 가능성을 오래 검토하지는 않는다고 응답했어요.'
       } },
-    { id: 'a-adapt', section: 'A', items: [{ q: 6 }],
+    { id: 'a-adapt', section: 'A', items: [{ q: 4 }],
       text: {
         high: '예상하지 못한 변화에 빠르게 적응하는 편이라고 응답했어요.',
         mid: '예상하지 못한 변화에 적응하는 속도는 보통이라고 응답했어요.',
         low: '예상하지 못한 변화에는 적응하는 데 시간이 걸리는 편이라고 응답했어요.'
       } },
-    { id: 'a-express', section: 'A', items: [{ q: 7 }, { q: 8 }], minAnswered: 1,
+    { id: 'a-express', section: 'A', items: [{ q: 5 }],
       text: {
-        high: '자신의 의견과 감정을 겉으로 분명하게 드러내는 편이라고 응답했어요.',
-        mid: '의견과 감정을 드러내는 정도는 보통이라고 응답했어요.',
-        low: '의견과 감정을 겉으로 많이 드러내지 않는 편이라고 응답했어요.',
-        mixed: '의견과 감정을 드러내는 정도는 상황에 따라 다르게 나타나는 편이에요.'
+        high: '자신의 의견을 다른 사람에게 분명하게 표현하는 편이라고 응답했어요.',
+        mid: '의견을 표현하는 정도는 보통이라고 응답했어요.',
+        low: '의견을 겉으로 많이 드러내지 않는 편이라고 응답했어요.'
       } },
-    { id: 'a-calm', section: 'A', items: [{ q: 9 }],
+    { id: 'a-calm', section: 'A', items: [{ q: 6 }],
       text: {
         high: '화가 나거나 흥분한 뒤 진정하는 데 시간이 걸리는 편이라고 응답했어요.',
         mid: '흥분한 뒤 진정하는 시간은 보통이라고 응답했어요.',
         low: '흥분한 뒤 비교적 금방 진정하는 편이라고 응답했어요.'
       } },
-    { id: 'a-steady', section: 'A', items: [{ q: 10 }],
-      text: {
-        high: '시작한 일을 일정한 속도로 꾸준히 이어가는 편이라고 응답했어요.',
-        mid: '일을 꾸준히 이어가는 정도는 보통이라고 응답했어요.',
-        low: '일을 일정한 속도로 이어가기보다 때에 따라 속도가 달라지는 편이라고 응답했어요.'
-      } },
-    { id: 'a-quick', section: 'A', items: [{ q: 11 }],
-      text: {
-        high: '평소 행동이 빠른 편이라고 응답했어요.',
-        mid: '평소 행동 속도는 보통이라고 응답했어요.',
-        low: '평소 행동이 천천히 이루어지는 편이라고 응답했어요.'
-      } },
 
     // ── B. 소화·식사
-    { id: 'b-discomfort', section: 'B', items: [{ q: 12 }, { q: 15 }], minAnswered: 1,
+    { id: 'b-discomfort', section: 'B', items: [{ q: 7 }],
       text: {
-        high: '소화 불편을 자주 경험한다고 응답했어요. (식사 후 더부룩함, 평소 양을 먹고도 불편함)',
-        mid: '식사 후 더부룩함이나 속 불편함을 가끔 경험한다고 응답했어요.',
-        low: '식사 후 더부룩함이나 속 불편함은 드물다고 응답했어요.',
-        mixed: '식사 후 더부룩함과 속 불편함은 상황에 따라 다르게 나타나는 편이에요.'
+        high: '소화 불편을 자주 경험한다고 응답했어요. (식사 후 더부룩함)',
+        mid: '식사 후 더부룩함을 가끔 경험한다고 응답했어요.',
+        low: '식사 후 더부룩함은 드물다고 응답했어요.'
       } },
-    { id: 'b-fullness', section: 'B', items: [{ q: 13 }],
+    { id: 'b-fullness', section: 'B', items: [{ q: 8 }],
       text: {
         high: '적은 양을 먹어도 금방 배가 부르다고 자주 응답했어요.',
         mid: '적은 양에도 배가 부른 느낌은 가끔 있다고 응답했어요.',
         low: '적은 양에 금방 배가 부른 경우는 드물다고 응답했어요.'
       } },
-    { id: 'b-appetite', section: 'B', items: [{ q: 14 }],
-      text: {
-        high: '식사 시간이 되어도 배고픔을 잘 느끼지 못하는 경우가 자주 있다고 응답했어요.',
-        mid: '식사 시간에 배고픔을 느끼지 못하는 경우가 가끔 있다고 응답했어요.',
-        low: '식사 시간에 배고픔을 느끼지 못하는 경우는 드물다고 응답했어요.'
-      } },
-    { id: 'b-stress', section: 'B', items: [{ q: 16 }],
+    { id: 'b-stress', section: 'B', items: [{ q: 9 }],
       text: {
         high: '긴장하거나 스트레스를 받으면 소화 상태가 달라지는 경우가 자주 있다고 응답했어요.',
         mid: '긴장하거나 스트레스를 받을 때 소화 상태가 달라지는 경우가 가끔 있다고 응답했어요.',
@@ -160,34 +131,32 @@ window.SURVEY = {
       } },
 
     // ── C. 땀·온도
-    { id: 'c-sweat', section: 'C', items: [{ q: 17 }, { q: 18, rev: true }], minAnswered: 1,
+    { id: 'c-sweat', section: 'C', items: [{ q: 10 }, { q: 11, rev: true }],
       text: {
         high: '가벼운 활동에도 땀이 쉽게 나는 편이라고 응답했어요.',
         mid: '땀이 나는 정도는 보통이라고 응답했어요.',
         low: '더운 날에도 땀이 적게 나는 편이라고 응답했어요.',
         mixed: '땀이 나는 정도는 상황에 따라 다르게 나타나는 편이에요.'
       } },
-    { id: 'c-aftersweat', section: 'C', items: [{ q: 19 }, { q: 20, rev: true }], minAnswered: 1,
+    { id: 'c-aftersweat', section: 'C', items: [{ q: 12 }],
       text: {
         high: '땀을 많이 흘린 뒤 기운이 떨어지는 편이라고 응답했어요.',
-        mid: '땀을 흘린 뒤의 느낌은 보통이라고 응답했어요.',
-        low: '땀을 흘리고 나면 몸이 가벼워지는 편이라고 응답했어요.',
-        mixed: '땀을 흘린 뒤의 느낌은 상황에 따라 다르게 나타나는 편이에요.'
+        mid: '땀을 흘린 뒤 기운이 떨어지는 정도는 보통이라고 응답했어요.',
+        low: '땀을 흘린 뒤에도 기운이 크게 떨어지지는 않는다고 응답했어요.'
       } },
-    { id: 'c-cold', section: 'C', items: [{ q: 21 }, { q: 23 }], minAnswered: 1,
+    { id: 'c-cold', section: 'C', items: [{ q: 13 }],
       text: {
-        high: '주변 사람들보다 추위를 많이 타고, 손발이 차갑게 느껴지는 경우가 많다고 응답했어요.',
-        mid: '추위를 타는 정도와 손발의 차가움은 보통이라고 응답했어요.',
-        low: '추위를 많이 타지 않고 손발이 차가운 경우도 많지 않다고 응답했어요.',
-        mixed: '추위를 타는 정도와 손발의 차가움은 상황에 따라 다르게 나타나는 편이에요.'
+        high: '주변 사람들보다 추위를 많이 타는 편이라고 응답했어요.',
+        mid: '추위를 타는 정도는 보통이라고 응답했어요.',
+        low: '주변 사람들보다 추위를 많이 타지는 않는다고 응답했어요.'
       } },
-    { id: 'c-heat', section: 'C', items: [{ q: 22 }],
+    { id: 'c-heat', section: 'C', items: [{ q: 14 }],
       text: {
         high: '주변 사람들보다 더위를 많이 타는 편이라고 응답했어요.',
         mid: '더위를 타는 정도는 보통이라고 응답했어요.',
         low: '주변 사람들보다 더위를 많이 타지는 않는다고 응답했어요.'
       } },
-    { id: 'c-water', section: 'C', choice: { q: 24 },
+    { id: 'c-water', section: 'C', choice: { q: 15 },
       text: {
         0: '평소 찬물을 선호한다고 응답했어요.',
         1: '평소 미지근한 물을 선호한다고 응답했어요.',
@@ -196,25 +165,24 @@ window.SURVEY = {
       } },
 
     // ── D. 수면·생활 리듬
-    { id: 'd-bowel', section: 'D', choice: { q: 25 },
+    { id: 'd-bowel', section: 'D', choice: { q: 16 },
       text: {
         0: '배변이 규칙적인 편이라고 응답했어요. (생활습관 참고용으로만 보여드려요)',
         1: '배변이 일정하지 않은 편이라고 응답했어요. (생활습관 참고용으로만 보여드려요)'
       } },
-    { id: 'd-wake', section: 'D', items: [{ q: 26 }],
+    { id: 'd-wake', section: 'D', items: [{ q: 17 }],
       text: {
         high: '잠든 뒤 중간에 자주 깬다고 응답했어요.',
         mid: '잠든 뒤 중간에 깨는 경우가 가끔 있다고 응답했어요.',
         low: '잠든 뒤 중간에 깨는 경우는 드물다고 응답했어요.'
       } },
-    { id: 'd-refresh', section: 'D', items: [{ q: 27 }],
+    { id: 'd-refresh', section: 'D', items: [{ q: 18 }],
       text: {
         high: '충분히 잘 기회가 있어도 아침에 개운하지 않은 경우가 자주 있다고 응답했어요.',
         mid: '충분히 자고도 아침에 개운하지 않은 경우가 가끔 있다고 응답했어요.',
         low: '충분히 자고 나면 아침이 개운하지 않은 경우는 드물다고 응답했어요.'
       } }
   ],
-
 
   /*
    * 사상체질 네 가지 유형 소개 (일반 참고 설명)
