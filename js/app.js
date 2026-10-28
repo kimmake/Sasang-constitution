@@ -143,7 +143,6 @@
     }).join('');
     return '' +
       '<section class="panel hero">' +
-        '<span class="eyebrow">참고용 설문</span>' +
         '<h1 tabindex="-1" id="view-title">나의 사상체질<br>관련 특성 알아보기</h1>' +
         '<p class="lead">평소 행동과 신체 상태를 돌아보는 참고용 설문입니다.</p>' +
         '<p class="notice"><strong>안내</strong>체질을 확정하는 검사가 아니며 의료적 진단을 대신하지 않습니다.</p>' +
@@ -152,7 +151,7 @@
       '<section class="panel">' +
         label('이 설문은요') +
         '<div class="stats">' +
-          ring(null, String(S.questions.filter(function (q) { return !q.onlySex; }).length), '문항') +
+          ring(null, String(S.questions.filter(function (q) { return !q.onlySex; }).length + 1), '문항') +
           ring(null, '약 5분', '소요 시간') +
           ring(null, '0건', '서버 저장') +
         '</div>' +
