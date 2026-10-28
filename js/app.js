@@ -266,8 +266,8 @@
     }).join('');
     return '<section class="panel more">' + label(G.title) +
       '<p class="body-text">' + esc(G.disclaimer) + '</p>' +
-      fold('카페에 가면', block(g.cafe)) +
-      fold('식당에 가면', block(g.food)) +
+      fold('카페에서는 이런 음료 어때요?', block(g.cafe)) +
+      fold('식당에서는 이런 메뉴 어때요?', block(g.food)) +
       fold('가볍게 해볼 운동', block(g.move, G.moveNote)) +
       fold('성향 조합 이야기', '<p class="body-text">' + esc(S.pairs.note) + '</p>' + pairRows) +
       '</section>';
