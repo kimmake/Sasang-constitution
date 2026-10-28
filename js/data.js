@@ -167,19 +167,19 @@ window.SURVEY = {
     note: '전통 사상의학에서 일반적으로 소개하는 네 가지 유형의 개요입니다. 이 설문의 결과와 연결되어 있지 않으며, 내가 어느 유형인지 알려주는 내용이 아니에요. 그림은 이해를 돕는 개념도이고, 실제 모습은 같은 유형 안에서도 개인차가 매우 큽니다. 체질 진단은 한의사 상담이 필요합니다.'
   },
   types: [
-    { id: 'taeyang', name: '태양인', ks: null, figure: { head: 21, neck: 20, sh: 64, wa: 30, hi: 34, leg: 10, scale: 1, shirt: '#7cc79a' },
+    { id: 'taeyang', name: '태양인', ks: null, callouts: [{ fig: 'F', part: 'chest', pos: 'top', text: '가슴 윗부분 발달' }, { fig: 'F', part: 'legs', pos: 'bottom', text: '가는 하체' }, { fig: 'M', part: 'head', pos: 'top', text: '큰 머리·굵은 목' }], figure: { head: 21, neck: 20, sh: 64, wa: 30, hi: 34, leg: 10, scale: 1, shirt: '#7cc79a' },
       tags: ['큰 머리·굵은 목', '가슴 윗부분 발달', '가는 하체'],
       build: '머리가 크고 목덜미와 가슴 윗부분이 발달한 반면, 허리 아래쪽 하체는 상대적으로 가늘다고 설명해요.',
       character: '두뇌 회전이 빠르고 창의적·진취적이며, 사람들과 어울리는 소통 능력과 영웅심이 강하다고 설명해요. 네 유형 중 가장 드문 유형으로 알려져 있어요.' },
-    { id: 'taeeum', name: '태음인', ks: 0, figure: { head: 17, neck: 14, sh: 62, wa: 56, hi: 58, leg: 17, scale: 1, shirt: '#5fb583' },
+    { id: 'taeeum', name: '태음인', ks: 0, callouts: [{ fig: 'M', part: 'chest', pos: 'top', text: '큰 골격' }, { fig: 'M', part: 'waist', pos: 'bottom', text: '허리·배 발달' }, { fig: 'F', part: 'body', pos: 'top', text: '듬직한 체격' }], figure: { head: 17, neck: 14, sh: 62, wa: 56, hi: 58, leg: 17, scale: 1, shirt: '#5fb583' },
       tags: ['큰 골격', '허리·배 발달', '듬직한 체격'],
       build: '체격이 크고 골격이 굵으며, 허리 둘레와 배 쪽이 발달해 전체적으로 듬직한 인상이라고 설명해요.',
       character: '느긋하고 끈기 있으며 참을성이 많아 한번 정한 일을 오래 이어가는 편이지만, 변화에는 신중하다고 설명해요.' },
-    { id: 'soyang', name: '소양인', ks: 2, figure: { head: 16, neck: 11, sh: 62, wa: 32, hi: 36, leg: 11, scale: 1, shirt: '#8fd1a2' },
+    { id: 'soyang', name: '소양인', ks: 2, callouts: [{ fig: 'M', part: 'chest', pos: 'top', text: '발달한 가슴·어깨' }, { fig: 'F', part: 'head', pos: 'top', text: '민첩한 인상' }, { fig: 'F', part: 'legs', pos: 'bottom', text: '가벼운 하체' }], figure: { head: 16, neck: 11, sh: 62, wa: 32, hi: 36, leg: 11, scale: 1, shirt: '#8fd1a2' },
       tags: ['발달한 가슴·어깨', '가벼운 하체', '민첩한 인상'],
       build: '가슴과 어깨 쪽이 발달하고 엉덩이·하체는 상대적으로 가벼워, 상체가 든든해 보인다고 설명해요.',
       character: '활달하고 민첩하며 솔직하고 사교적이지만, 서두르는 편이라 끝맺음에 신경이 필요하다고 설명해요.' },
-    { id: 'soeum', name: '소음인', ks: 1, figure: { head: 15, neck: 11, sh: 42, wa: 34, hi: 48, leg: 14, scale: 0.9, shirt: '#a6d98e' },
+    { id: 'soeum', name: '소음인', ks: 1, callouts: [{ fig: 'F', part: 'head', pos: 'top', text: '섬세한 인상' }, { fig: 'M', part: 'body', pos: 'top', text: '작고 아담한 체격' }, { fig: 'M', part: 'legs', pos: 'bottom', text: '어깨보다 하체 발달' }], figure: { head: 15, neck: 11, sh: 42, wa: 34, hi: 48, leg: 14, scale: 0.9, shirt: '#a6d98e' },
       tags: ['작고 아담한 체격', '어깨보다 하체 발달', '섬세한 인상'],
       build: '전체적으로 몸집이 작고 아담하며, 어깨보다 아랫부분이 상대적으로 발달해 있다고 설명해요.',
       character: '차분하고 꼼꼼하며 섬세하고, 조용히 생각하는 편이라고 설명해요.' }

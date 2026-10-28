@@ -35,38 +35,86 @@
   }
 
 
-  /* 유형 개념도 (평면 일러스트, 비율만 다르게 그림) */
-  function figure(f) {
-    var cx = 60, skin = '#f6d9b8', pants = '#2f6f50', hair = '#2b2b2b';
-    var shY = 64, waY = 108, hiY = 128, bottom = 190;
-    var torso = [[cx - f.sh / 2, shY], [cx + f.sh / 2, shY], [cx + f.wa / 2, waY], [cx + f.hi / 2, hiY], [cx - f.hi / 2, hiY], [cx - f.wa / 2, waY]]
-      .map(function (p) { return p[0] + ',' + p[1]; }).join(' ');
-    var legGap = Math.max(4, f.hi * 0.12), lx1 = cx - legGap / 2 - f.leg, lx2 = cx + legGap / 2;
-    return '<svg class="fig" viewBox="0 0 120 200" role="img" aria-hidden="true">' +
-      '<g transform="translate(60 190) scale(' + f.scale + ') translate(-60 -190)">' +
-      '<line x1="' + (cx - f.sh / 2 + 4) + '" y1="' + (shY + 6) + '" x2="' + (cx - f.sh / 2 - 2) + '" y2="122" stroke="' + skin + '" stroke-width="9" stroke-linecap="round"/>' +
-      '<line x1="' + (cx + f.sh / 2 - 4) + '" y1="' + (shY + 6) + '" x2="' + (cx + f.sh / 2 + 2) + '" y2="122" stroke="' + skin + '" stroke-width="9" stroke-linecap="round"/>' +
-      '<rect x="' + lx1 + '" y="' + (hiY - 4) + '" width="' + f.leg + '" height="' + (bottom - hiY + 4) + '" rx="' + (f.leg / 2.5) + '" fill="' + skin + '"/>' +
-      '<rect x="' + lx2 + '" y="' + (hiY - 4) + '" width="' + f.leg + '" height="' + (bottom - hiY + 4) + '" rx="' + (f.leg / 2.5) + '" fill="' + skin + '"/>' +
-      '<rect x="' + (cx - f.hi / 2) + '" y="' + (hiY - 14) + '" width="' + f.hi + '" height="22" rx="6" fill="' + pants + '"/>' +
-      '<polygon points="' + torso + '" fill="' + f.shirt + '" stroke="' + f.shirt + '" stroke-width="8" stroke-linejoin="round"/>' +
-      '<rect x="' + (cx - f.neck / 2) + '" y="' + (shY - 16) + '" width="' + f.neck + '" height="22" fill="' + skin + '"/>' +
-      '<circle cx="' + cx + '" cy="' + (shY - 16 - f.head + 6) + '" r="' + f.head + '" fill="' + skin + '"/>' +
-      '<path d="M' + (cx - f.head) + ' ' + (shY - 16 - f.head + 2) + ' A' + f.head + ' ' + f.head + ' 0 0 1 ' + (cx + f.head) + ' ' + (shY - 16 - f.head + 2) + ' Q' + cx + ' ' + (shY - 16 - f.head - 4) + ' ' + (cx - f.head) + ' ' + (shY - 16 - f.head + 2) + 'Z" fill="' + hair + '"/>' +
-      '<circle cx="' + (cx - f.head * 0.35) + '" cy="' + (shY - 16 - f.head + 8) + '" r="1.8" fill="#333"/><circle cx="' + (cx + f.head * 0.35) + '" cy="' + (shY - 16 - f.head + 8) + '" r="1.8" fill="#333"/>' +
-      '<path d="M' + (cx - 4) + ' ' + (shY - 16 - f.head + 14) + ' Q' + cx + ' ' + (shY - 16 - f.head + 18) + ' ' + (cx + 4) + ' ' + (shY - 16 - f.head + 14) + '" stroke="#333" stroke-width="1.6" fill="none" stroke-linecap="round"/>' +
-      '</g></svg>';
+  /* 유형 개념도: 만화풍 인물 (굵은 윤곽선). 비율만 유형별로 다르게 그림 */
+  var INK = '#2b2b2b';
+  function toon(f, sex, callouts) {
+    var F = sex === 'F', k = 1.5 * (f.scale || 1), cx = 100;
+    var r = f.head * k * (F ? 0.95 : 1), cy = 34 + r;
+    var neckW = f.neck * k * (F ? 0.9 : 1), shY = cy + r + 14;
+    var shW = f.sh * k * (F ? 0.9 : 1.08), waW = f.wa * k, hiW = f.hi * k * (F ? 1.06 : 1);
+    var waY = shY + 62 * (f.scale || 1), hiY = shY + 100 * (f.scale || 1);
+    var legW = f.leg * k, gap = 6, feetY = hiY + 150 * (f.scale || 1), armW = 14 * (f.scale || 1) + 2;
+    var skin = '#fcdcc0', top = F ? '#ffffff' : '#bfe3cd', shorts = F ? '#f6c945' : '#b79a9a';
+    var o = ' stroke="' + INK + '" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"';
+    var out = '<svg class="toon" viewBox="0 0 200 380" aria-hidden="true">';
+
+    // 팔 (몸통 뒤)
+    [-1, 1].forEach(function (d) {
+      var x1 = cx + d * (shW / 2 - 4), y1 = shY + 8, x2 = cx + d * (shW / 2 + 12), y2 = hiY + 6;
+      out += '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="' + INK + '" stroke-width="' + (armW + 7) + '" stroke-linecap="round"/>' +
+             '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="' + skin + '" stroke-width="' + armW + '" stroke-linecap="round"/>' +
+             '<circle cx="' + x2 + '" cy="' + (y2 + 6) + '" r="' + (armW * 0.62) + '" fill="' + skin + '"' + o + '/>';
+    });
+    // 다리와 신발
+    [-1, 1].forEach(function (d) {
+      var lx = cx + d * (gap / 2 + legW / 2);
+      out += '<rect x="' + (lx - legW / 2) + '" y="' + (hiY + 10) + '" width="' + legW + '" height="' + (feetY - hiY - 6) + '" rx="' + (legW / 3) + '" fill="' + skin + '"' + o + '/>' +
+             '<ellipse cx="' + (lx + d * 3) + '" cy="' + (feetY + 6) + '" rx="' + (legW * 0.78) + '" ry="9" fill="#fff"' + o + '/>';
+    });
+    // 반바지, 상의
+    out += '<rect x="' + (cx - hiW / 2) + '" y="' + (hiY - 8) + '" width="' + hiW + '" height="40" rx="10" fill="' + shorts + '"' + o + '/>';
+    out += '<polygon points="' + [[cx - shW / 2, shY], [cx + shW / 2, shY], [cx + waW / 2, waY], [cx + hiW / 2, hiY], [cx - hiW / 2, hiY], [cx - waW / 2, waY]].map(function (p) { return p.join(','); }).join(' ') + '" fill="' + top + '"' + o + '/>';
+    // 목
+    out += '<rect x="' + (cx - neckW / 2) + '" y="' + (cy + r - 8) + '" width="' + neckW + '" height="26" fill="' + skin + '"' + o + '/>';
+    // 머리카락 뒤쪽(올림머리)
+    if (F) out += '<circle cx="' + (cx - r * 0.72) + '" cy="' + (cy - r * 0.92) + '" r="' + (r * 0.36) + '" fill="' + INK + '"/><circle cx="' + (cx + r * 0.72) + '" cy="' + (cy - r * 0.92) + '" r="' + (r * 0.36) + '" fill="' + INK + '"/>';
+    // 얼굴
+    out += '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" fill="' + skin + '"' + o + '/>';
+    out += '<path d="M' + (cx - r) + ' ' + (cy - 2) + ' A' + r + ' ' + r + ' 0 0 1 ' + (cx + r) + ' ' + (cy - 2) + ' Q' + cx + ' ' + (cy - r * 0.55) + ' ' + (cx - r) + ' ' + (cy - 2) + 'Z" fill="' + INK + '"/>';
+    if (F) out += '<rect x="' + (cx - r * 0.95) + '" y="' + (cy - r * 0.42) + '" width="' + (r * 1.9) + '" height="' + (r * 0.26) + '" rx="4" fill="#f6c945"' + o.replace('width="4"', 'width="3"') + '/>';
+    out += '<circle cx="' + (cx - r * 0.38) + '" cy="' + (cy + r * 0.16) + '" r="2.6" fill="' + INK + '"/><circle cx="' + (cx + r * 0.38) + '" cy="' + (cy + r * 0.16) + '" r="2.6" fill="' + INK + '"/>';
+    out += '<ellipse cx="' + (cx - r * 0.62) + '" cy="' + (cy + r * 0.42) + '" rx="' + (r * 0.2) + '" ry="' + (r * 0.14) + '" fill="#ff9d8a"/><ellipse cx="' + (cx + r * 0.62) + '" cy="' + (cy + r * 0.42) + '" rx="' + (r * 0.2) + '" ry="' + (r * 0.14) + '" fill="#ff9d8a"/>';
+    out += '<path d="M' + (cx - r * 0.22) + ' ' + (cy + r * 0.45) + ' Q' + cx + ' ' + (cy + r * 0.66) + ' ' + (cx + r * 0.22) + ' ' + (cy + r * 0.45) + '" fill="none" stroke="' + INK + '" stroke-width="2.6" stroke-linecap="round"/>';
+
+    // 설명선: 라벨(위/아래) 중앙에서 해당 부위로
+    var anchors = {
+      head: [cx + r * 0.62, cy - r * 0.55],
+      chest: [cx - Math.max(shW / 2 - 8, r + 8), shY + 22],
+      body: [cx + Math.max(shW / 2 - 8, r + 8), shY + 48],
+      waist: [cx + waW / 2, waY],
+      legs: [cx + legW * 0.9, hiY + 90]
+    };
+    callouts.forEach(function (c) {
+      var a = anchors[c.part];
+      // 라벨 아래(또는 위)에서 가로로 꺾어 해당 부위까지 세로로 내려오는 설명선 (얼굴을 가로지르지 않도록)
+      var y0 = c.pos === 'top' ? 6 : 374;
+      out += '<polyline points="100,' + y0 + ' ' + a[0] + ',' + y0 + ' ' + a[0] + ',' + a[1] + '" fill="none" stroke="' + INK + '" stroke-width="2"/>' +
+             '<rect x="' + (a[0] - 4) + '" y="' + (a[1] - 4) + '" width="8" height="8" fill="' + INK + '"/>';
+    });
+    return out + '</svg>';
+  }
+
+  function figureCol(t, fig) {
+    var cs = (t.callouts || []).filter(function (c) { return c.fig === fig; });
+    function lab(pos) {
+      var c = cs.filter(function (x) { return x.pos === pos; })[0];
+      return '<p class="st-label ' + pos + '"' + (c ? '' : ' aria-hidden="true"') + '>' + (c ? esc(c.text) : '') + '</p>';
+    }
+    return '<div class="st-fig st-' + (fig === 'F' ? 'left' : 'right') + '">' + lab('top') + toon(t.figure, fig, cs) + lab('bottom') + '</div>';
   }
 
   function renderTypes(topKs) {
     return '<details class="fold fold-card types"><summary>' + esc(S.typesIntro.title) + '</summary><div class="fold-body">' +
       '<p class="types-note">' + esc(S.typesIntro.note) + '</p>' +
-      '<div class="type-grid">' + S.types.map(function (t) {
+      '<div class="st-list">' + S.types.map(function (t) {
         var mine = topKs !== null && topKs !== undefined && t.ks === topKs;
-        return '<article class="type-card' + (mine ? ' is-mine' : '') + '"><h3>' + esc(t.name) + (mine ? '<span class="mine">내 응답과 가까운 유형</span>' : '') + '</h3>' +
-          '<div class="type-body"><div class="type-fig">' + figure(t.figure) + '</div>' +
-          '<ul class="type-tags">' + t.tags.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div>' +
-          '<dl class="type-rows"><div><dt>체형</dt><dd>' + esc(t.build) + '</dd></div><div><dt>성격</dt><dd>' + esc(t.character) + '</dd></div></dl></article>';
+        return '<article class="st-card' + (mine ? ' is-mine' : '') + '">' +
+          '<div class="st-title">- 사상체질 -</div>' +
+          '<div class="st-grid">' + figureCol(t, 'F') +
+            '<div class="st-mid"><h3 class="st-name">' + esc(t.name) + '</h3>' + (mine ? '<span class="mine">내 응답과 가까운 유형</span>' : '') +
+              '<table class="st-table"><tbody><tr><th scope="row">체형</th><td>' + esc(t.build) + '</td></tr><tr><th scope="row">성격</th><td>' + esc(t.character) + '</td></tr></tbody></table></div>' +
+            figureCol(t, 'M') +
+          '</div></article>';
       }).join('') + '</div></div></details>';
   }
 
