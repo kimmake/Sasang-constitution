@@ -68,6 +68,28 @@
     para(summary, saveX, INNER - 200 - 8, 28, '500', C.text, 42);
     y = sy + sh + 24;
 
+    // KS-15 방식 참고 결과 (확률·정확도 수치 없음)
+    if (m.ks) {
+      var kt = m.ks.tie ? S.typeResult.tie : null;
+      var cav = S.typeResult.caveats.slice(0, 3).join(' ');
+      var bh = (kt ? measure(kt, INNER - 56, 30, '600', 46) + 40 : 40 + 38 + 96 + 16) + measure(cav, INNER - 56, 24, '400', 36) + 56;
+      if (!dry) { rr(ctx, PAD, y, INNER, bh, 20); ctx.fillStyle = C.green; ctx.fill(); }
+      var by0 = y; y += 28;
+      if (kt) {
+        para(kt, PAD + 28, INNER - 56, 30, '600', '#ffffff', 46);
+      } else {
+        font('700', 28); ctx.fillStyle = '#ffffff'; ctx.textBaseline = 'top'; ctx.textAlign = 'center';
+        if (!dry) { ctx.fillText(S.typeResult.title + ' (참고용)', W / 2, y); }
+        y += 44;
+        font('800', 84); if (!dry) { ctx.fillText(m.ks.topName, W / 2, y); }
+        y += 104;
+        ctx.textAlign = 'left';
+      }
+      y += 8;
+      para(cav, PAD + 28, INNER - 56, 24, '400', '#e6f5ec', 36);
+      y = by0 + bh + 24;
+    }
+
     if (m.recentChange) {
       var rh = measure('안내  ' + m.recentChange, INNER - 56, 28, '600', 42) + 44;
       if (!dry) { rr(ctx, PAD, y, INNER, rh, 24); ctx.fillStyle = C.tan; ctx.fill(); }

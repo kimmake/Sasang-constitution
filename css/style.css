@@ -208,3 +208,23 @@ h1 { font-size: 2.5rem; line-height: 1.28; color: var(--green); font-weight: 800
 .type-rows dd { margin: 0; padding: 14px 16px; font-size: 1.1rem; line-height: 1.6; }
 @media (min-width: 900px) { .type-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 420px) { .type-body { grid-template-columns: 110px 1fr; } .type-rows > div { grid-template-columns: 60px 1fr; } }
+
+/* 유형 결과 */
+.type-result { gap: 18px; }
+.type-big { background: var(--green); color: #fff; border-radius: 16px; padding: 26px 20px; text-align: center; display: grid; gap: 4px; }
+.type-big span { font-size: 1.1rem; font-weight: 700; opacity: .95; }
+.type-big strong { font-size: 3rem; line-height: 1.2; letter-spacing: -.02em; }
+.type-big em { font-style: normal; font-size: 1.05rem; background: rgba(255,255,255,.2); justify-self: center; padding: .1rem .9rem; border-radius: 999px; margin-top: 6px; }
+.type-tags.center { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.scores { background: var(--gray); border-radius: 10px; padding: 12px 18px; }
+.scores summary { cursor: pointer; font-weight: 800; color: var(--green-d); min-height: 44px; display: flex; align-items: center; }
+.scores table { width: 100%; border-collapse: collapse; margin: 8px 0; font-size: 1.1rem; }
+.scores th, .scores td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); }
+.scores td { text-align: right; font-variant-numeric: tabular-nums; }
+.scores tr.top th, .scores tr.top td { color: var(--green-d); font-weight: 800; }
+.caveats { margin: 0; padding-left: 1.2rem; display: grid; gap: 8px; font-size: 1.05rem; color: var(--muted); }
+.sec-gap { padding: 36px 0 0; }
+.type-card.is-mine { border-width: 4px; }
+.mine { display: block; font-size: .85rem; font-weight: 700; background: #fff; color: var(--green-d); border-radius: 999px; width: max-content; margin: 4px auto 0; padding: 0 .8rem; }
+.ref-extra { margin: 6px 0 0; padding-left: 1.1rem; }
+.ref-extra li { margin-bottom: 4px; word-break: keep-all; }

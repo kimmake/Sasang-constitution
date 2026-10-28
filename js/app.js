@@ -14,6 +14,7 @@
   function optionsOf(q) { return q.options || S.scales[q.scale]; }
   function isOptional(q) { return !!(q.optional || q.skippable); }
   function answeredCount() { return Object.keys(state.answers).length; }
+  function qs() { return R.visibleQuestions(state.answers); }
   function label(text) { return '<h2 class="sec-label">' + esc(text) + '</h2>'; }
 
   /* 도넛 통계 원 (pct 0~1). pct가 null이면 테두리만 있는 원 */
@@ -57,12 +58,13 @@
       '</g></svg>';
   }
 
-  function renderTypes() {
+  function renderTypes(topKs) {
     return '<section class="panel types">' +
       label(S.typesIntro.title) +
       '<p class="types-note">' + esc(S.typesIntro.note) + '</p>' +
       '<div class="type-grid">' + S.types.map(function (t) {
-        return '<article class="type-card"><h3>' + esc(t.name) + '</h3>' +
+        var mine = topKs !== null && topKs !== undefined && t.ks === topKs;
+        return '<article class="type-card' + (mine ? ' is-mine' : '') + '"><h3>' + esc(t.name) + (mine ? '<span class="mine">내 응답과 가까운 유형</span>' : '') + '</h3>' +
           '<div class="type-body"><div class="type-fig">' + figure(t.figure) + '</div>' +
           '<ul class="type-tags">' + t.tags.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div>' +
           '<dl class="type-rows"><div><dt>체형</dt><dd>' + esc(t.build) + '</dd></div><div><dt>성격</dt><dd>' + esc(t.character) + '</dd></div></dl></article>';
@@ -73,7 +75,7 @@
   function renderStart() {
     var resume = answeredCount() > 0;
     var domains = S.sections.map(function (s) {
-      return '<li><span class="dom-circle">' + s.id + '</span><strong>' + esc(s.title) + '</strong>' + (s.optional ? '<em>선택</em>' : '') + '</li>';
+      return '<li><span class="dom-circle">' + esc(s.short || s.id) + '</span><strong>' + esc(s.title) + '</strong>' + (s.optional ? '<em>선택</em>' : '') + '</li>';
     }).join('');
     return '' +
       '<section class="panel hero">' +
@@ -86,7 +88,7 @@
       '<section class="panel">' +
         label('이 설문은요') +
         '<div class="stats">' +
-          ring(null, String(S.questions.length), '문항') +
+          ring(null, String(S.questions.filter(function (q) { return !q.onlySex; }).length), '문항') +
           ring(null, '약 5분', '소요 시간') +
           ring(null, '0건', '서버 저장') +
         '</div>' +
@@ -111,9 +113,10 @@
 
   /* ───────── 설문 ───────── */
   function renderQuestion() {
-    var q = S.questions[state.index];
+    var list = qs();
+    var q = list[state.index];
     var sec = section(q.section);
-    var total = S.questions.length;
+    var total = list.length;
     var pct = (state.index + 1) / total;
     var cur = state.answers[q.id];
     var scaled = !!q.scale;
@@ -130,7 +133,7 @@
     var last = state.index === total - 1;
     var secIdx = S.sections.indexOf(sec);
     var timeline = S.sections.map(function (s, i) {
-      return '<li class="' + (i < secIdx ? 'done' : i === secIdx ? 'now' : '') + '"><span class="dot"></span><span class="lab"><b>' + s.id + '</b><i>' + esc(s.title) + '</i></span></li>';
+      return '<li class="' + (i < secIdx ? 'done' : i === secIdx ? 'now' : '') + '"><span class="dot"></span><span class="lab"><b>' + esc(s.short || s.id) + '</b><i>' + esc(s.title) + '</i></span></li>';
     }).join('');
 
     return '' +
@@ -142,7 +145,7 @@
       '<section class="bubble-card">' +
         '<div class="tags"><span class="pill">' + sec.id + ' · ' + esc(sec.title) + '</span>' + (isOptional(q) ? '<span class="tag">선택 응답</span>' : '') + '</div>' +
         '<p class="instruction">' + esc(sec.instruction || S.baseInstruction) + '</p>' +
-        '<h2 class="q-text" tabindex="-1" id="view-title"><span class="q-no">Q' + q.id + '</span>' + esc(q.text) + '</h2>' +
+        '<h2 class="q-text" tabindex="-1" id="view-title"><span class="q-no">Q' + (state.index + 1) + '</span>' + esc(q.text) + '</h2>' +
         '<div class="opts" role="radiogroup" aria-labelledby="view-title">' + opts + '</div>' +
         hint +
         '<div class="nav">' +
@@ -152,18 +155,44 @@
       '</section>';
   }
 
+
+  /* KS-15 방식 점수로 가장 가까운 유형 표시 (확률·정확도 수치는 만들지 않음) */
+  function renderTypeResult(m) {
+    var tr = S.typeResult;
+    var inner;
+    if (!m.ks) {
+      inner = '<p class="hold">' + esc(S.holdText.overall) + '</p>';
+    } else if (m.ks.tie) {
+      inner = '<p class="hold">' + esc(tr.tie) + '</p>';
+    } else {
+      var t = S.types.filter(function (x) { return x.ks === m.ks.top; })[0];
+      var rows = S.ks15.labels.map(function (name, i) {
+        return '<tr' + (i === m.ks.top ? ' class="top"' : '') + '><th scope="row">' + esc(name) + '</th><td>' + m.ks.scores[i].toFixed(2) + '</td></tr>';
+      }).join('');
+      inner = '<div class="type-big"><span>' + esc(tr.title) + '</span><strong>' + esc(m.ks.topName) + '</strong><em>참고용 · 확정이 아니에요</em></div>' +
+        '<ul class="type-tags center">' + t.tags.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' +
+        '<details class="scores"><summary>유형별 점수 보기</summary>' +
+          '<table><thead><tr><th>유형</th><th>KS-15 가중치 합계</th></tr></thead><tbody>' + rows + '</tbody></table>' +
+          '<p class="small-note">점수는 확률이 아니며, 점수 차이가 작으면 판별이 덜 뚜렷할 수 있어요.</p></details>';
+    }
+    return '<section class="panel type-result">' + label('KS-15 방식 참고 결과') + inner +
+      '<ul class="caveats">' + tr.caveats.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></section>';
+  }
+
   /* ───────── 결과 ───────── */
   function renderResult() {
     var m = R.build(state.answers);
     var head = '' +
       '<section class="panel result-head">' +
         label('Result') +
-        '<h1 tabindex="-1" id="view-title">내 응답에서 확인된 특성</h1>' +
-        '<p class="lead">체질을 확정하지 않고, 답해 주신 내용을 영역별로 정리했어요.</p>' +
+        '<h1 tabindex="-1" id="view-title">내 응답 결과</h1>' +
+        '<p class="lead">답해 주신 내용으로 가까운 유형과 영역별 특성을 정리했어요.</p>' +
         '<div class="stat-row">' + ring(m.answered / m.total, m.answered + '/' + m.total, '응답한 문항') +
           '<p class="stat-text">' + (m.answered === m.total ? '본 문항 ' + m.total + '개에 <strong>모두 응답</strong>하셨어요.' : '본 문항 ' + m.total + '개 중 <strong>' + m.answered + '개</strong>에 응답하셨어요.<br>미응답은 계산에서 제외했어요.') + '<br><span>(최근 변화 확인 문항 제외)</span></p></div>' +
         (m.recentChange ? '<p class="notice recent"><strong>안내</strong>' + esc(m.recentChange) + '</p>' : '') +
       '</section>';
+
+    var typePanel = renderTypeResult(m);
 
     var body;
     if (m.holdAll) {
@@ -184,7 +213,7 @@
       }).join('') + '</div>';
     }
 
-    var foot = renderTypes() +
+    var foot = renderTypes(m.ks && m.ks.top !== null ? m.ks.top : null) +
       '<section class="banner">이 결과는 응답을 정리한 것이며, 좋고 나쁨이나 건강 여부를 나타내지 않습니다. 체질 판정이나 의료적 진단을 대신하지 않아요. 몸 상태가 걱정되시면 전문가와 상담해 주세요.</section>' +
       '<div class="actions">' +
         '<button type="button" class="btn btn-primary" data-act="image">이미지로 저장하기</button>' +
@@ -195,8 +224,9 @@
         '<h2>참고문헌</h2>' +
         '<p>' + esc(S.reference.citation) + '<br><a href="' + esc(S.reference.url) + '" target="_blank" rel="noopener noreferrer">' + esc(S.reference.url) + '</a></p>' +
         '<p class="disclaimer">' + esc(S.reference.disclaimer) + '</p>' +
+        '<ul class="ref-extra">' + S.reference.extra.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' +
       '</section>';
-    return head + body + foot;
+    return head + typePanel + (m.holdAll ? '' : '<div class="sec-gap">' + label('응답에서 확인된 특성') + '</div>') + body + foot;
   }
 
   /* ───────── 공통 ───────── */
@@ -208,7 +238,7 @@
   }
 
   function refreshChoice() {
-    var q = S.questions[state.index];
+    var q = qs()[state.index];
     var cur = state.answers[q.id];
     Array.prototype.forEach.call(app.querySelectorAll('.opt'), function (b) {
       var on = String(cur) === b.getAttribute('data-v');
@@ -220,21 +250,26 @@
   }
 
   function pick(v) {
-    var q = S.questions[state.index];
+    var q = qs()[state.index];
     state.answers[q.id] = v === 'skip' ? 'skip' : Number(v);
+    if (q.id === S.sexQuestion) {
+      // 성별을 바꾸면 반대 성별 전용 문항의 기존 응답은 지웁니다
+      var sex = R.sexOf(state.answers);
+      S.questions.forEach(function (x) { if (x.onlySex && x.onlySex !== sex) delete state.answers[x.id]; });
+    }
     state.hint = false;
     refreshChoice();
   }
 
   function next() {
-    var q = S.questions[state.index];
+    var q = qs()[state.index];
     if (!isOptional(q) && state.answers[q.id] === undefined) {
       state.hint = true;
       if (!app.querySelector('.hint')) app.querySelector('.opts').insertAdjacentHTML('afterend', '<p class="hint" role="alert">아직 선택하지 않으셨어요. 편하신 답을 하나 골라 주세요.</p>');
       return;
     }
     state.hint = false;
-    if (state.index === S.questions.length - 1) { state.view = 'result'; } else { state.index++; }
+    if (state.index === qs().length - 1) { state.view = 'result'; } else { state.index++; }
     render();
   }
 
@@ -258,14 +293,14 @@
     else if (act === 'next') next();
     else if (act === 'prev') prev();
     else if (act === 'restart') restart();
-    else if (act === 'edit') { state.view = 'q'; state.index = S.questions.length - 1; render(); }
+    else if (act === 'edit') { state.view = 'q'; state.index = qs().length - 1; render(); }
     else if (act === 'image') window.SurveyImage.open(R.build(state.answers));
   });
 
   // 노트북: 숫자키로 선택, ←/→ 로 이동
   document.addEventListener('keydown', function (e) {
     if (state.view !== 'q' || e.target.closest('#overlay') || e.ctrlKey || e.metaKey || e.altKey) return;
-    var q = S.questions[state.index];
+    var q = qs()[state.index];
     var n = parseInt(e.key, 10);
     if (n >= 1 && n <= optionsOf(q).length) pick(n - 1);
     else if (e.key === 'ArrowRight') next();
