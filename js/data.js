@@ -164,7 +164,7 @@ window.SURVEY = {
 
   typesIntro: {
     title: '사상체질 네 가지 유형 알아보기',
-    note: '전통 사상의학에서 일반적으로 소개하는 네 가지 유형의 개요입니다. 이 설문의 결과와 연결되어 있지 않으며, 내가 어느 유형인지 알려주는 내용이 아니에요. 그림은 이해를 돕는 개념도이고, 실제 모습은 같은 유형 안에서도 개인차가 매우 큽니다. 체질 진단은 한의사 상담이 필요합니다.'
+    note: '전통 사상의학에서 일반적으로 소개하는 유형의 개요예요. 그림은 이해를 돕는 개념도이고, 실제 모습은 같은 유형 안에서도 개인차가 매우 커요.'
   },
   types: [
     { id: 'taeyang', name: '태양인', ks: null, callouts: [{ fig: 'F', part: 'chest', pos: 'top', text: '가슴 윗부분 발달' }, { fig: 'F', part: 'legs', pos: 'bottom', text: '가는 하체' }, { fig: 'M', part: 'head', pos: 'top', text: '큰 머리·굵은 목' }], figure: { head: 21, neck: 20, sh: 64, wa: 30, hi: 34, leg: 10, scale: 1, shirt: '#7cc79a' },
@@ -196,7 +196,7 @@ window.SURVEY = {
    */
   guides: {
     title: '내 유형 맞춤 메뉴 추천',
-    disclaimer: '재미로 즐기는 메뉴 추천이에요. 건강 정보는 아니니, 지병이 있거나 약을 드신다면 의사·약사와 상의하세요.',
+    disclaimer: '재미로 즐기는 메뉴 추천이에요.',
     moveNote: '무리하지 않는 선에서 가볍게 시작해 보세요.',
     types: {
       0: {
