@@ -252,6 +252,27 @@
     return '<section class="panel glance">' + label('한눈에 보기') + '<div class="glance-list">' + rows + '</div>' + '</section>';
   }
 
+  /* 내 유형으로 더 알아보기: 카페·식당·운동·성향 조합 (KS-15 유형이 정해졌을 때만) */
+  function renderMore(m) {
+    if (!m.ks || m.ks.top === null) return '';
+    var top = m.ks.top, G = S.guides, g = G.types[top], names = S.ks15.labels;
+    function chips(items) { return '<ul class="chips">' + items.map(function (x) { return '<li class="chip">' + esc(x) + '</li>'; }).join('') + '</ul>'; }
+    function fold(title, body) { return '<details class="fold"><summary>' + esc(title) + '</summary><div class="fold-body">' + body + '</div></details>'; }
+    function block(b, extra) { return '<p class="body-text">' + esc(b.lead) + '</p>' + chips(b.items) + (extra ? '<p class="small-note">' + esc(extra) + '</p>' : ''); }
+    var pairRows = [0, 1, 2].map(function (o) {
+      var key = Math.min(top, o) + '-' + Math.max(top, o), x = S.pairs.list[key];
+      return '<div class="pair"><h4>' + esc(names[top]) + ' × ' + esc(names[o]) + '</h4>' +
+        '<p><b>잘 맞는 점</b>' + esc(x.match) + '</p><p><b>맞춰 가면 좋은 점</b>' + esc(x.adjust) + '</p></div>';
+    }).join('');
+    return '<section class="panel more">' + label(G.title) +
+      '<p class="body-text">' + esc(G.disclaimer) + '</p>' +
+      fold('카페에 가면', block(g.cafe)) +
+      fold('식당에 가면', block(g.food)) +
+      fold('가볍게 해볼 운동', block(g.move, G.moveNote)) +
+      fold('성향 조합 이야기', '<p class="body-text">' + esc(S.pairs.note) + '</p>' + pairRows) +
+      '</section>';
+  }
+
   /* ───────── 결과 ───────── */
   function renderResult() {
     var m = R.build(state.answers);
@@ -290,7 +311,7 @@
         S.reference.extra.map(function (x) { return '<p>' + esc(x) + '</p>'; }).join('') +
       '</section>';
 
-    return head + renderTypeResult(m) + renderGlance(m) + actions + detail + renderOtherTypes(m) + refs;
+    return head + renderTypeResult(m) + renderGlance(m) + actions + renderMore(m) + detail + renderOtherTypes(m) + refs;
   }
 
   /* ───────── 공통 ───────── */
